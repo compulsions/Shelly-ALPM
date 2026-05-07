@@ -36,7 +36,7 @@ internal static class CliPathResolver
         var dir = new DirectoryInfo(start);
         while (dir != null)
         {
-            if (dir.GetFiles("*.slnx").Length > 0 || dir.GetFiles("*.sln").Length > 0)
+            if (dir.GetFiles("*.slnx").Length > 0)
                 return dir.FullName;
             dir = dir.Parent;
         }
