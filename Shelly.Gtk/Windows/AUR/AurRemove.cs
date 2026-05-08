@@ -125,7 +125,6 @@ public class AurRemove(
 
         var action = CallbackAction.New((_, _) =>
         {
-                searchEntry.SetText("");
                 searchEntry.GrabFocus();
                 return true;
         });

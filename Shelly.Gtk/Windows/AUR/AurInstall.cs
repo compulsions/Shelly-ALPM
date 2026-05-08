@@ -166,7 +166,6 @@ public class AurInstall(
             {
                 if (triggerStr == "<Control>f")
                 {
-                    _searchEntry.SetText("");
                     _searchEntry.GrabFocus();
                     return true;
                 }

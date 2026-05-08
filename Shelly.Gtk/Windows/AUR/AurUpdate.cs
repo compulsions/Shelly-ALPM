@@ -125,7 +125,6 @@ public class AurUpdate(
 
         var action = CallbackAction.New((_, _) =>
         {
-            searchEntry.SetText("");
             searchEntry.GrabFocus();
             return true;
         });
