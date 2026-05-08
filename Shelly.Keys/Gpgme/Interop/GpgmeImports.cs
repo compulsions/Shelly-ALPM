@@ -84,4 +84,7 @@ internal static partial class GpgmeImports
 
     [LibraryImport(LibraryName)]
     public static partial IntPtr gpgme_strsource(uint err);
+    
+    [LibraryImport(LibraryName)]
+    public static partial uint gpgme_engine_check_version(GpgmeNative.gpgme_protocol_t proto);
 }

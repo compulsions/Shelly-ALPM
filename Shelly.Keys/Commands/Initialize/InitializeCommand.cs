@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Shelly.Keys.Gpgme;
 using Shelly.Keys.Gpgme.Interop;
@@ -8,15 +9,16 @@ using static System.IO.UnixFileMode;
 namespace Shelly.Keys.Commands.Initialize;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-public class  InitializeCommand : AsyncCommand<Settings>
+public class InitializeCommand : AsyncCommand<Settings>
 {
     private const string GpgConf = """
-                           no-greeting
-                           no-permission-warning
-                           lock-never
-                           keyserver-options timeout=10
-                           keyserver hkps://keyserver.ubuntu.com
-                           """;
+                                   no-greeting
+                                   no-permission-warning
+                                   keyserver-options timeout=10
+                                   keyserver-options import-clean
+                                   keyserver-options no-self-sigs-only
+                                   """;
+
     private const uint GPGME_CREATE_NOPASSWD = 128;
     private const uint GPGME_CREATE_NOEXPIRE = 256;
 
@@ -33,43 +35,6 @@ public class  InitializeCommand : AsyncCommand<Settings>
         //Creation with mode 0700
         Directory.CreateDirectory(settings.Directory, FilePermissions | UserExecute);
 
-        var pubringGpgInfo = new FileInfo(Path.Combine(settings.Directory, "pubring.conf"));
-        if (!pubringGpgInfo.Exists)
-        {
-            await pubringGpgInfo.Create().DisposeAsync();
-        }
-
-        if (pubringGpgInfo.UnixFileMode != FilePermissions)
-        {
-            pubringGpgInfo.UnixFileMode = FilePermissions;
-            pubringGpgInfo.Refresh();
-        }
-
-        var pubringKbxInfo = new FileInfo(Path.Combine(settings.Directory, "pubring.kbx"));
-        if (!pubringKbxInfo.Exists)
-        {
-            await pubringKbxInfo.Create().DisposeAsync();
-        }
-
-        if (pubringKbxInfo.UnixFileMode != FilePermissions)
-        {
-            pubringKbxInfo.UnixFileMode = FilePermissions;
-            pubringKbxInfo.Refresh();
-        }
-
-        var trustdbGpgInfo = new FileInfo(Path.Combine(settings.Directory, "trustdb.gpg"));
-        if (!trustdbGpgInfo.Exists)
-        {
-            await trustdbGpgInfo.Create().DisposeAsync();
-        }
-
-        if (trustdbGpgInfo.UnixFileMode != FilePermissions)
-        {
-            trustdbGpgInfo.UnixFileMode = FilePermissions;
-            trustdbGpgInfo.Refresh();
-        }
-
-        AnsiConsole.MarkupLine("[bold green]Keyring files created[/]");
 
         AnsiConsole.MarkupLine("[bold green]Setting up and Verifying gpg configuration[/]");
 
@@ -96,21 +61,31 @@ public class  InitializeCommand : AsyncCommand<Settings>
             File.SetUnixFileMode(gpgConfiguration.FullName, FilePermissions);
         }
 
-        
         AnsiConsole.MarkupLine("[bold green]GPG configuration set up[/]");
         AnsiConsole.MarkupLine("[bold green]Starting Gpgme keyring setup[/]");
+
+        var gpgAgentConf = new FileInfo(Path.Combine(settings.Directory, "gpg-agent.conf"));
+        if (!gpgAgentConf.Exists)
+        {
+            var fileStream = gpgAgentConf.CreateText();
+            await fileStream.WriteLineAsync("disable-scdaemon");
+            fileStream.Close();
+            File.SetUnixFileMode(gpgAgentConf.FullName, FilePermissions);
+        }
 
         using var ctx = new GpgmeContext();
         ctx.SetEngineInfo(
             GpgmeNative.gpgme_protocol_t.GPGME_PROTOCOL_OpenPGP,
-            fileName:null,
+            fileName: null,
             homeDir: settings.Directory);
-        
+        var engineErr = GpgmeImports.gpgme_engine_check_version(GpgmeNative.gpgme_protocol_t.GPGME_PROTOCOL_OpenPGP);
+        GpgmeHelpers.ThrowIfError(engineErr);
+
         GpgmeImports.gpgme_op_keylist_start(ctx.Handle, null, 0);
         GpgmeImports.gpgme_op_keylist_end(ctx.Handle);
         AnsiConsole.MarkupLine("[bold green]Gpgme keyring setup complete[/]");
 
-        AnsiConsole.MarkupLine("[bold green]Generating local signing key");
+        AnsiConsole.MarkupLine("[bold green]Generating local signing key[/]");
 
         if (!GpgmeContext.HasSecretKey(ctx))
         {
@@ -126,6 +101,26 @@ public class  InitializeCommand : AsyncCommand<Settings>
         {
             AnsiConsole.MarkupLine("[bold green]Skipping keyring already has a master key[/]");
         }
+
+        var psi = new ProcessStartInfo("gpg")
+        {
+            ArgumentList =
+                { "--homedir", settings.Directory, "--no-permission-warning", "--batch", "--update-trustdb" },
+            UseShellExecute = false,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+        };
+        using var p = Process.Start(psi);
+        await p!.WaitForExitAsync();
+        AnsiConsole.MarkupLine($"[bold green]{p.StandardError.ReadToEnd()}");
+        var exitCode = p.ExitCode;
+        if (exitCode != 0)
+        {
+            AnsiConsole.MarkupLine(
+                $"[bold red] Failed to execute gpg trust db update with exitcode {exitCode} [/]");
+            return exitCode;
+        }
+
 
         return 0;
     }
