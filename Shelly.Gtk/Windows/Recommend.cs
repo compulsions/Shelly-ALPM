@@ -111,6 +111,8 @@ public class Recommend(
     {
         try
         {
+            var sizeGroup = SizeGroup.New(SizeGroupMode.Both);
+
             foreach (var category in Enum.GetValues<RecommendCategory>())
             {
                 var categoryPackages = _packages.Where(x => x.Category == category).ToList();
@@ -124,15 +126,15 @@ public class Recommend(
 
                 var flox = FlowBox.New();
                 flox.SetSelectionMode(SelectionMode.None);
-                flox.SetColumnSpacing(12);
-                flox.SetRowSpacing(12);
-                flox.Homogeneous = false;
+                flox.SetColumnSpacing(8);
+                flox.SetRowSpacing(8);
+                flox.Homogeneous = true;
                 flox.MinChildrenPerLine = 1;
                 flox.MaxChildrenPerLine = 6;
 
                 foreach (var item in categoryPackages)
                 {
-                    AddFlowBoxItem(flox, item);
+                    AddFlowBoxItem(flox, item, sizeGroup);
                 }
 
                 sectionBox.Append(label);
@@ -149,13 +151,13 @@ public class Recommend(
         }
     }
 
-    private void AddFlowBoxItem(FlowBox flowBox, FlatRecommendModel item)
+    private void AddFlowBoxItem(FlowBox flowBox, FlatRecommendModel item, SizeGroup sizeGroup)
     {
-        var contentBox = Box.New(Orientation.Horizontal, 12);
-        contentBox.SetMarginTop(12);
-        contentBox.SetMarginBottom(12);
-        contentBox.SetMarginStart(12);
-        contentBox.SetMarginEnd(12);
+        var contentBox = Box.New(Orientation.Horizontal, 10);
+        contentBox.SetMarginTop(8);
+        contentBox.SetMarginBottom(8);
+        contentBox.SetMarginStart(10);
+        contentBox.SetMarginEnd(10);
         contentBox.SetHexpand(true);
 
         var iconPath = iconResolverService.GetIconPath(item.Package);
@@ -164,6 +166,7 @@ public class Recommend(
             var image = Image.NewFromFile(iconPath);
             image.SetPixelSize(48);
             image.SetValign(Align.Center);
+            image.AddCssClass("icon-dropshadow");
             contentBox.Append(image);
         }
 
@@ -180,7 +183,7 @@ public class Recommend(
         var versionLabel = Label.New(item.Version);
         versionLabel.SetHalign(Align.Start);
         versionLabel.SetValign(Align.Center);
-        versionLabel.AddCssClass("dim-label");
+        versionLabel.AddCssClass("caption");
 
         var installedCheck = Image.NewFromIconName("object-select-symbolic");
         installedCheck.SetVisible(item.IsInstalled);
@@ -194,9 +197,10 @@ public class Recommend(
         descLabel.SetHalign(Align.Start);
         descLabel.AddCssClass("dim-label");
         descLabel.SetWrap(true);
-        descLabel.SetWrapMode(Pango.WrapMode.Word);
-        descLabel.SetEllipsize(Pango.EllipsizeMode.None);
-        descLabel.SetLines(0);
+        descLabel.SetWrapMode(Pango.WrapMode.WordChar);
+        descLabel.SetEllipsize(Pango.EllipsizeMode.End);
+        descLabel.SetLines(2);
+        descLabel.MaxWidthChars = 40;
 
         textContainer.Append(titleContainer);
         textContainer.Append(descLabel);
@@ -206,6 +210,7 @@ public class Recommend(
         var downloadButton = Button.NewFromIconName("folder-download-symbolic");
         downloadButton.AddCssClass("suggested-action");
         downloadButton.SetValign(Align.Center);
+        downloadButton.SetTooltipText(item.IsInstalled ? "Already installed" : "Install " + item.Package);
         downloadButton.OnClicked += async (_, _) =>
         {
             if (item.IsInstalled)
@@ -242,7 +247,8 @@ public class Recommend(
         frame.Hexpand = true;
         frame.Halign = Align.Fill;
         frame.AddCssClass("card");
-        
+
+        sizeGroup.AddWidget(frame);
         flowBox.Append(frame);
     }
 
