@@ -18,63 +18,44 @@ public class ShellySearch(
     ILockoutService lockoutService) : IShellyWindow
 {
     private readonly CancellationTokenSource _cts = new();
-    private Box _box = null!;
-    private ColumnView _columnView = null!;
     private Gio.ListStore _listStore = null!;
     private SingleSelection _selectionModel = null!;
     private Button _installButton = null!;
     private Button _removeButton = null!;
     private string? _initialQuery;
 
-    private SignalListItemFactory _checkFactory = null!;
-    private SignalListItemFactory _nameFactory = null!;
-    private SignalListItemFactory _repoFactory = null!;
-    private SignalListItemFactory _versionFactory = null!;
-    private SignalListItemFactory _descriptionFactory = null!;
-    private SignalListItemFactory _lastUpdatedFactory = null!;
-
-    private ColumnViewColumn _checkColumn = null!;
-    private ColumnViewColumn _nameColumn = null!;
-    private ColumnViewColumn _repoColumn = null!;
-    private ColumnViewColumn _versionColumn = null!;
-    private ColumnViewColumn _descriptionColumn = null!;
-    private ColumnViewColumn _lastUpdatedColumn = null!;
-
-    private Dictionary<ColumnViewCell, EventHandler> _checkBinding = [];
-    private Dictionary<ColumnViewCell, EventHandler> _installedBinding = [];
+    private readonly Dictionary<ColumnViewCell, EventHandler> _checkBinding = [];
+    private readonly Dictionary<ColumnViewCell, EventHandler> _installedBinding = [];
     private readonly List<MetaPackageGObject> _packageGObjectRefs = [];
 
     private Stack _searchStack = null!;
     private Spinner _searchSpinner = null!;
     private SearchEntry _searchEntry = null!;
 
-    public Widget CreateWindow() => CreateWindow(null);
-
-    public Widget CreateWindow(string? initialQuery)
+    public Widget CreateWindow()
     {
-        _initialQuery = initialQuery;
         var builder = Builder.NewFromString(ResourceHelper.LoadUiFile("UiFiles/ShellySearchWindow.ui"), -1);
 
-        _box = (Box)builder.GetObject("ShellySearchWindow")!;
-        _columnView = (ColumnView)builder.GetObject("package_grid")!;
+        var box = (Box)builder.GetObject("ShellySearchWindow")!;
+        var columnView = (ColumnView)builder.GetObject("package_grid")!;
         _installButton = (Button)builder.GetObject("install_button")!;
         _installButton.SetSensitive(false);
         _removeButton = (Button)builder.GetObject("remove_button")!;
         _removeButton.SetSensitive(false);
 
-        _checkColumn = (ColumnViewColumn)builder.GetObject("check_column")!;
-        _nameColumn = (ColumnViewColumn)builder.GetObject("name_column")!;
-        _nameColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
+        var checkColumn = (ColumnViewColumn)builder.GetObject("check_column")!;
+        var nameColumn = (ColumnViewColumn)builder.GetObject("name_column")!;
+        nameColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
             string.Compare(a.Package?.Name, b.Package?.Name, StringComparison.OrdinalIgnoreCase)));
-        _repoColumn = (ColumnViewColumn)builder.GetObject("repo_column")!;
-        _repoColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
+        var repoColumn = (ColumnViewColumn)builder.GetObject("repo_column")!;
+        repoColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
             string.Compare(a.Package?.Repository, b.Package?.Repository, StringComparison.OrdinalIgnoreCase)));
-        _versionColumn = (ColumnViewColumn)builder.GetObject("version_column")!;
-        _versionColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
+        var versionColumn = (ColumnViewColumn)builder.GetObject("version_column")!;
+        versionColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
             string.Compare(a.Package?.Version, b.Package?.Version, StringComparison.OrdinalIgnoreCase)));
-        _descriptionColumn = (ColumnViewColumn)builder.GetObject("description_column")!;
-        _lastUpdatedColumn = (ColumnViewColumn)builder.GetObject("last_updated_column")!;
-        _lastUpdatedColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
+        var descriptionColumn = (ColumnViewColumn)builder.GetObject("description_column")!;
+        var lastUpdatedColumn = (ColumnViewColumn)builder.GetObject("last_updated_column")!;
+        lastUpdatedColumn.SetSorter(CustomSorter.New<MetaPackageGObject>((a, b) =>
             a.Package == null || b.Package == null ? 0 : a.Package.LastUpdated.CompareTo(b.Package.LastUpdated)));
         _searchEntry = (SearchEntry)builder.GetObject("search_entry")!;
 
@@ -89,14 +70,14 @@ public class ShellySearch(
 
         _listStore = Gio.ListStore.New(MetaPackageGObject.GetGType());
         _selectionModel = SingleSelection.New(
-            SortListModel.New(_listStore, _columnView.GetSorter()));
+            SortListModel.New(_listStore, columnView.GetSorter()));
         _selectionModel.CanUnselect = true;
-        _columnView.SetModel(_selectionModel);
+        columnView.SetModel(_selectionModel);
 
-        SetupColumns(_checkColumn, _nameColumn, _repoColumn, _versionColumn, _descriptionColumn, _lastUpdatedColumn);
+        SetupColumns(checkColumn, nameColumn, repoColumn, versionColumn, descriptionColumn, lastUpdatedColumn);
 
-        ColumnViewHelper.AlignColumnHeader(_columnView, 2, Align.Start);
-        ColumnViewHelper.AlignColumnHeader(_columnView, 3, Align.End);
+        ColumnViewHelper.AlignColumnHeader(columnView, 2, Align.Start);
+        ColumnViewHelper.AlignColumnHeader(columnView, 3, Align.End);
 
         _installButton.OnClicked += (_, _) => { _ = InstallSelectedAsync(); };
         _removeButton.OnClicked += (_, _) => { _ = RemoveSelectedAsync(); };
@@ -117,10 +98,10 @@ public class ShellySearch(
         _searchStack.AddNamed(spinnerBox, "loading");
 
         // Move the ScrolledWindow (parent of _columnView) into the stack
-        var scrolledWindow = _columnView.GetParent()!;
-        _box.Remove(scrolledWindow);
+        var scrolledWindow = columnView.GetParent()!;
+        box.Remove(scrolledWindow);
         _searchStack.AddNamed(scrolledWindow, "results");
-        _box.Append(_searchStack);
+        box.Append(_searchStack);
 
         _searchStack.SetVisibleChildName("results");
 
@@ -129,7 +110,7 @@ public class ShellySearch(
             _ = LoadDataAsync();
         }
 
-        _columnView.OnActivate += (_, _) =>
+        columnView.OnActivate += (_, _) =>
         {
             if (_selectionModel.GetSelectedItem() is MetaPackageGObject pkgObj)
             {
@@ -137,14 +118,14 @@ public class ShellySearch(
             }
         };
 
-        return _box;
+        return box;
     }
 
     private void SetupColumns(ColumnViewColumn checkColumn, ColumnViewColumn nameColumn, ColumnViewColumn repoColumn,
         ColumnViewColumn versionColumn, ColumnViewColumn descriptionColumn, ColumnViewColumn lastUpdatedColumn)
     {
-        _checkFactory = SignalListItemFactory.New();
-        _checkFactory.OnSetup += (_, args) =>
+        var checkFactory = SignalListItemFactory.New();
+        checkFactory.OnSetup += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             var check = CheckButton.New();
@@ -158,7 +139,7 @@ public class ShellySearch(
                 UpdateButtonSensitivity();
             };
         };
-        _checkFactory.OnBind += (_, args) =>
+        checkFactory.OnBind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is not MetaPackageGObject pkgObj ||
@@ -173,16 +154,16 @@ public class ShellySearch(
                 if (listItem.GetItem() == pkgObj) check.SetActive(pkgObj.IsSelected);
             }
         };
-        _checkFactory.OnUnbind += (_, args) =>
+        checkFactory.OnUnbind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is not MetaPackageGObject pkgObj) return;
             if (_checkBinding.Remove(listItem, out var handler)) pkgObj.OnSelectionToggled -= handler;
         };
-        checkColumn.SetFactory(_checkFactory);
+        checkColumn.SetFactory(checkFactory);
 
-        _nameFactory = SignalListItemFactory.New();
-        _nameFactory.OnSetup += (_, args) =>
+        var nameFactory = SignalListItemFactory.New();
+        nameFactory.OnSetup += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             var box = Box.New(Orientation.Horizontal, 6);
@@ -196,7 +177,7 @@ public class ShellySearch(
             box.Append(installedIcon);
             listItem.SetChild(box);
         };
-        _nameFactory.OnBind += (_, args) =>
+        nameFactory.OnBind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is not MetaPackageGObject { Package: { } pkg } pkgObj ||
@@ -216,35 +197,33 @@ public class ShellySearch(
                 installedIcon.Visible = pkgObj.IsInstalled;
             }
         };
-        _nameFactory.OnUnbind += (_, args) =>
+        nameFactory.OnUnbind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is not MetaPackageGObject pkgObj) return;
             if (_installedBinding.Remove(listItem, out var handler)) pkgObj.OnIsInstalledChanged -= handler;
         };
-        nameColumn.SetFactory(_nameFactory);
+        nameColumn.SetFactory(nameFactory);
 
-        _repoFactory = SignalListItemFactory.New();
-        _repoFactory.OnSetup += (_, args) =>
+        var repoFactory = SignalListItemFactory.New();
+        repoFactory.OnSetup += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             var label = Label.New(null);
             label.Halign = Align.End;
             label.MarginStart = 6;
-            //label.Wrap = true;
-            //label.WrapMode = Pango.WrapMode.WordChar;
             listItem.SetChild(label);
         };
-        _repoFactory.OnBind += (_, args) =>
+        repoFactory.OnBind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is MetaPackageGObject { Package: { } pkg } && listItem.GetChild() is Label label)
                 label.SetText(pkg.Repository);
         };
-        repoColumn.SetFactory(_repoFactory);
+        repoColumn.SetFactory(repoFactory);
 
-        _versionFactory = SignalListItemFactory.New();
-        _versionFactory.OnSetup += (_, args) =>
+        var versionFactory = SignalListItemFactory.New();
+        versionFactory.OnSetup += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             var label = Label.New(null);
@@ -254,16 +233,16 @@ public class ShellySearch(
             label.Xalign = 1;
             listItem.SetChild(label);
         };
-        _versionFactory.OnBind += (_, args) =>
+        versionFactory.OnBind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is MetaPackageGObject { Package: { } pkg } && listItem.GetChild() is Label label)
                 label.SetText(pkg.Version);
         };
-        versionColumn.SetFactory(_versionFactory);
+        versionColumn.SetFactory(versionFactory);
 
-        _descriptionFactory = SignalListItemFactory.New();
-        _descriptionFactory.OnSetup += (_, args) =>
+        var descriptionFactory = SignalListItemFactory.New();
+        descriptionFactory.OnSetup += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             var label = Label.New(null);
@@ -279,16 +258,16 @@ public class ShellySearch(
             label.WidthRequest = 1;
             listItem.SetChild(label);
         };
-        _descriptionFactory.OnBind += (_, args) =>
+        descriptionFactory.OnBind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is MetaPackageGObject { Package: { } pkg } && listItem.GetChild() is Label label)
                 label.SetText(pkg.Description);
         };
-        descriptionColumn.SetFactory(_descriptionFactory);
+        descriptionColumn.SetFactory(descriptionFactory);
 
-        _lastUpdatedFactory = SignalListItemFactory.New();
-        _lastUpdatedFactory.OnSetup += (_, args) =>
+        var lastUpdatedFactory = SignalListItemFactory.New();
+        lastUpdatedFactory.OnSetup += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             var label = Label.New(null);
@@ -304,13 +283,13 @@ public class ShellySearch(
             label.WidthRequest = 1;
             listItem.SetChild(label);
         };
-        _lastUpdatedFactory.OnBind += (_, args) =>
+        lastUpdatedFactory.OnBind += (_, args) =>
         {
             if (args.Object is not ColumnViewCell listItem) return;
             if (listItem.GetItem() is MetaPackageGObject { Package: { } pkg } && listItem.GetChild() is Label label)
                 label.SetText(DateTimeOffset.FromUnixTimeSeconds(pkg.LastUpdated).ToString("yyyy-MM-dd HH:mm"));
         };
-        lastUpdatedColumn.SetFactory(_lastUpdatedFactory);
+        lastUpdatedColumn.SetFactory(lastUpdatedFactory);
     }
 
     private async Task LoadDataAsync()
