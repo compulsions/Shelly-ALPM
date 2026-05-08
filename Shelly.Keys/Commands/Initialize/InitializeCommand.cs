@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using Shelly.Keys.Gpg;
 using Shelly.Keys.Gpgme;
 using Shelly.Keys.Gpgme.Interop;
 using Spectre.Console;
@@ -74,45 +76,94 @@ public class InitializeCommand : AsyncCommand<Settings>
         }
 
         using var ctx = new GpgmeContext();
+        if (ctx.Handle.IsInvalid)
+        {
+            throw new InvalidOperationException("gpgme_new returned an invalid handle");
+        }
+
         ctx.SetEngineInfo(
             GpgmeNative.gpgme_protocol_t.GPGME_PROTOCOL_OpenPGP,
             fileName: null,
             homeDir: settings.Directory);
+        AnsiConsole.MarkupLine("[bold green]Gpgme engine set up![/]");
         var engineErr = GpgmeImports.gpgme_engine_check_version(GpgmeNative.gpgme_protocol_t.GPGME_PROTOCOL_OpenPGP);
-        GpgmeHelpers.ThrowIfError(engineErr);
+        GpgmeHelpers.ThrowIfErrorString(engineErr);
 
-        GpgmeImports.gpgme_op_keylist_start(ctx.Handle, null, 0);
-        GpgmeImports.gpgme_op_keylist_end(ctx.Handle);
+        var startError = GpgmeImports.gpgme_op_keylist_start(ctx.Handle, IntPtr.Zero, 0);
+        GpgmeHelpers.ThrowIfErrorString(startError);
+        var endErr = GpgmeImports.gpgme_op_keylist_end(ctx.Handle);
+        GpgmeHelpers.ThrowIfErrorString(endErr);
+
         AnsiConsole.MarkupLine("[bold green]Gpgme keyring setup complete[/]");
 
         AnsiConsole.MarkupLine("[bold green]Generating local signing key[/]");
 
+        string fpr;
+        bool hasKey = false;
         if (!GpgmeContext.HasSecretKey(ctx))
         {
             var err = GpgmeImports.gpgme_op_createkey(ctx.Handle, "Pacman Keyring Master Key <pacman@localhost>",
                 "rsa4096",
-                0,
+                IntPtr.Zero,
                 0,
                 IntPtr.Zero,
                 GPGME_CREATE_NOPASSWD | GPGME_CREATE_NOEXPIRE);
-            GpgmeHelpers.ThrowIfError(err);
+            if (err != 0) throw new InvalidOperationException($"createkey: 0x{err:X8}");
+            GpgmeHelpers.ThrowIfErrorString(err);
+            var resultPtr = GpgmeImports.gpgme_op_genkey_result(ctx.Handle);
+            var result = Marshal.PtrToStructure<GpgmeNative.GpgmeGenkeyResult>(resultPtr);
+            fpr = Marshal.PtrToStringUTF8(result.fpr)
+                  ?? throw new InvalidOperationException("genkey result has no fingerprint");
         }
         else
         {
             AnsiConsole.MarkupLine("[bold green]Skipping keyring already has a master key[/]");
+            fpr = await GpgHelpers.GetMasterFingerprintAsync(settings.Directory);
+            hasKey = true;
         }
 
+        List<string> argList = [];
+        if (hasKey)
+        {
+            
+        }
         var psi = new ProcessStartInfo("gpg")
         {
-            ArgumentList =
-                { "--homedir", settings.Directory, "--no-permission-warning", "--batch", "--update-trustdb" },
+            
             UseShellExecute = false,
             RedirectStandardError = true,
             RedirectStandardOutput = true,
+            RedirectStandardInput = true,
         };
+        if (!hasKey)
+        {
+            psi.ArgumentList.Add("--homedir");
+            psi.ArgumentList.Add(settings.Directory);
+            psi.ArgumentList.Add("--no-permission-warning");
+            psi.ArgumentList.Add("--batch");
+            psi.ArgumentList.Add("--update-trustdb");
+        }
+        else
+        {
+            psi.ArgumentList.Add("--homedir");
+            psi.ArgumentList.Add(settings.Directory);
+            psi.ArgumentList.Add("--no-permission-warning");
+            psi.ArgumentList.Add("--batch");
+            psi.ArgumentList.Add("--check-trustdb");
+        }
         using var p = Process.Start(psi);
+        var outputError = p!.StandardError.ReadToEndAsync();
+        var output = p!.StandardOutput.ReadToEndAsync();
+        if (!hasKey)
+        {
+            await p.StandardInput.WriteLineAsync($"{fpr}:6:");
+        }
+        p.StandardInput.Close();
         await p!.WaitForExitAsync();
-        AnsiConsole.MarkupLine($"[bold green]{p.StandardError.ReadToEnd()}");
+        var stdout = await output;
+        var stderr = await outputError;
+        AnsiConsole.MarkupLine($"[bold green]{Markup.Escape(stdout.Trim())}[/]");
+        AnsiConsole.MarkupLine($"[bold green]{Markup.Escape(stderr.Trim())}[/]");
         var exitCode = p.ExitCode;
         if (exitCode != 0)
         {
@@ -120,8 +171,10 @@ public class InitializeCommand : AsyncCommand<Settings>
                 $"[bold red] Failed to execute gpg trust db update with exitcode {exitCode} [/]");
             return exitCode;
         }
-
-
+        AnsiConsole.MarkupLine("[bold green]Trust db updated[/]");
         return 0;
+
     }
+    
+    
 }

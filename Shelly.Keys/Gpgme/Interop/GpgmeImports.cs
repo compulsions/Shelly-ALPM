@@ -17,7 +17,7 @@ internal static partial class GpgmeImports
     public static partial void gpgme_release(IntPtr ctx);
 
     [LibraryImport(LibraryName)]
-    public static partial uint gpgme_set_engine_info(GpgmeContextHandle ctx, GpgmeNative.gpgme_protocol_t proto, [MarshalAs(UnmanagedType.LPUTF8Str)] string? file_name, [MarshalAs(UnmanagedType.LPUTF8Str)] string? home_dir);
+    public static partial uint gpgme_ctx_set_engine_info(GpgmeContextHandle ctx, GpgmeNative.gpgme_protocol_t proto, IntPtr file_name, IntPtr  home_dir);
 
     // Data operations
     [LibraryImport(LibraryName)]
@@ -40,7 +40,7 @@ internal static partial class GpgmeImports
 
     // Key operations
     [LibraryImport(LibraryName)]
-    public static partial uint gpgme_op_keylist_start(GpgmeContextHandle ctx, [MarshalAs(UnmanagedType.LPUTF8Str)] string? pattern, int secret_only);
+    public static partial uint gpgme_op_keylist_start(GpgmeContextHandle ctx, IntPtr pattern, int secret_only);
 
     [LibraryImport(LibraryName)]
     public static partial uint gpgme_op_keylist_next(GpgmeContextHandle ctx, out IntPtr key);
@@ -70,7 +70,7 @@ internal static partial class GpgmeImports
         GpgmeContextHandle ctx,
         string userid,
         string? algo,
-        ulong reserved,
+        IntPtr reserved,
         ulong expires,
         IntPtr extrakey,
         uint flags);

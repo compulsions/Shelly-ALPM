@@ -14,7 +14,7 @@ public sealed class GpgmeData : IDisposable
     public GpgmeData()
     {
         uint err = GpgmeImports.gpgme_data_new_from_mem(out _handle, IntPtr.Zero, UIntPtr.Zero, 0);
-        GpgmeHelpers.ThrowIfError(err);
+        GpgmeHelpers.ThrowIfErrorString(err);
     }
 
     public static GpgmeData FromMemory(byte[] buffer)
@@ -29,7 +29,7 @@ public sealed class GpgmeData : IDisposable
     {
         var data = new GpgmeData { _handle = null! };
         uint err = GpgmeImports.gpgme_data_new_from_fd(out data._handle, fd);
-        GpgmeHelpers.ThrowIfError(err);
+        GpgmeHelpers.ThrowIfErrorString(err);
         return data;
     }
 

@@ -2,7 +2,9 @@
     <Application>
         <Assembly Name="Spectre.Console" Dynamic="Required All"/>
         <Assembly Name="Spectre.Console.Cli" Dynamic="Required All"/>
-        <Assembly Name="shelly" Dynamic="Required All">
+        <Assembly Name="shelly-keys" Dynamic="Required All">
+            <Type Name="Shelly.Keys.Commands.Initialize.InitializeCommand"/>
+            <Type Name="Shelly.Keys.Commands.Initialize.Settings"/>
         </Assembly>
     </Application>
 </Directives>

@@ -1,3 +1,20 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using System.Reflection;
+using Shelly.Keys.Commands.Initialize;
+using Spectre.Console.Cli;
 
-Console.WriteLine("Hello, World!");
+var app = new CommandApp();
+app.Configure(config =>
+{
+    config.SetApplicationName("shelly-keys");
+    config.SetApplicationVersion(Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "unknown");
+
+    config.AddCommand<InitializeCommand>("initialize")
+        .WithDescription("Initialize gpg keys")
+        .WithExample("initialize")
+        .WithExample("initialize", "/etc/pacman.d/gnupg")
+        .WithAlias("--init")
+        .WithAlias("-i")
+        .WithAlias("init");
+});
+var result = app.Run(args);
+return result;

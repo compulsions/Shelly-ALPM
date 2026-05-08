@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Shelly.Keys.Gpgme.Interop;
 
 namespace Shelly.Keys.Gpgme;
@@ -17,26 +18,39 @@ public sealed class GpgmeContext : IDisposable
     public GpgmeContext()
     {
         uint err = GpgmeImports.gpgme_new(out _handle);
-        GpgmeHelpers.ThrowIfError(err);
+        GpgmeHelpers.ThrowIfErrorString(err);
     }
 
     public void SetEngineInfo(GpgmeNative.gpgme_protocol_t proto, string? fileName, string? homeDir)
     {
-        uint err = GpgmeImports.gpgme_set_engine_info(_handle, proto, fileName, homeDir);
-        GpgmeHelpers.ThrowIfError(err);
+        var filePtr = IntPtr.Zero;
+        var homePtr = IntPtr.Zero;
+        try
+        {
+            filePtr = fileName is null ? IntPtr.Zero : Marshal.StringToCoTaskMemUTF8(fileName);
+            homePtr = homeDir  is null ? IntPtr.Zero : Marshal.StringToCoTaskMemUTF8(homeDir);
+
+            var err = GpgmeImports.gpgme_ctx_set_engine_info(_handle, proto, filePtr, homePtr);
+            GpgmeHelpers.ThrowIfErrorString(err);
+        }
+        finally
+        {
+            if (filePtr != IntPtr.Zero) Marshal.FreeCoTaskMem(filePtr);
+            if (homePtr != IntPtr.Zero) Marshal.FreeCoTaskMem(homePtr);
+        }
     }
     
     // Crypto operations
     public void Verify(GpgmeData sig, GpgmeData signedText, GpgmeData plain)
     {
-        uint err = GpgmeImports.gpgme_op_verify(_handle, sig.Handle, signedText.Handle, plain?.Handle ?? new GpgmeDataHandle());
-        GpgmeHelpers.ThrowIfError(err);
+        var err = GpgmeImports.gpgme_op_verify(_handle, sig.Handle, signedText.Handle, plain?.Handle ?? new GpgmeDataHandle());
+        GpgmeHelpers.ThrowIfErrorString(err);
     }
 
     public void Sign(GpgmeData plain, GpgmeData sig, GpgmeNative.gpgme_sig_mode_t mode)
     {
-        uint err = GpgmeImports.gpgme_op_sign(_handle, plain.Handle, sig.Handle, mode);
-        GpgmeHelpers.ThrowIfError(err);
+        var err = GpgmeImports.gpgme_op_sign(_handle, plain.Handle, sig.Handle, mode);
+        GpgmeHelpers.ThrowIfErrorString(err);
     }
 
     public string CheckVersion(string version)
@@ -50,8 +64,8 @@ public sealed class GpgmeContext : IDisposable
 
     public static bool HasSecretKey(GpgmeContext ctx)
     {
-        var err = GpgmeImports.gpgme_op_keylist_start(ctx.Handle, pattern: null, secret_only: 1);
-        GpgmeHelpers.ThrowIfError(err);
+        var err = GpgmeImports.gpgme_op_keylist_start(ctx.Handle, pattern: IntPtr.Zero, secret_only: 1);
+        GpgmeHelpers.ThrowIfErrorString(err);
 
         try
         {
@@ -68,7 +82,7 @@ public sealed class GpgmeContext : IDisposable
             if ((err & 0xFFFF) == GPG_ERR_EOF)
                 return false;
 
-            GpgmeHelpers.ThrowIfError(err); // any other error
+            GpgmeHelpers.ThrowIfErrorString(err); // any other error
             return false;
         }
         finally

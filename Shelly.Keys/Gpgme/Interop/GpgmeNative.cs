@@ -81,4 +81,15 @@ public static class GpgmeNative
         public uint chain_model;
         public uint validities;
     }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct GpgmeGenkeyResult
+    {
+        public uint bitfield;   // primary:1, sub:1, uid:1, ... packed
+        public IntPtr fpr;      // const char *
+        public IntPtr pubkey;
+        public IntPtr seckey;
+    }
+
+
 }
