@@ -6,4 +6,7 @@ public interface IFingerprintAuthDetector
     bool FprintdServiceActive();
 }
 
-public sealed record FingerprintDetectionResult(bool SudoUsesFingerprint, IReadOnlyList<string> MatchingFiles);
+public sealed record FingerprintDetectionResult(
+    bool SudoUsesFingerprint,
+    bool FprintdServiceRunning,
+    IReadOnlyList<string> MatchingFiles);

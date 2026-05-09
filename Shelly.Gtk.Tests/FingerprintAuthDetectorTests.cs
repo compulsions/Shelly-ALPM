@@ -6,12 +6,17 @@ namespace Shelly.Gtk.Tests;
 public class FingerprintAuthDetectorTests
 {
     private string _tempDir = null!;
+    private string _etc = null!;
+    private string _vendor = null!;
 
     [SetUp]
     public void SetUp()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), "shelly-fpd-tests-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(_tempDir);
+        _etc = Path.Combine(_tempDir, "etc-pam.d");
+        _vendor = Path.Combine(_tempDir, "usr-lib-pam.d");
+        Directory.CreateDirectory(_etc);
+        Directory.CreateDirectory(_vendor);
     }
 
     [TearDown]
@@ -20,21 +25,35 @@ public class FingerprintAuthDetectorTests
         try { Directory.Delete(_tempDir, true); } catch { }
     }
 
-    private string WriteFixture(string name, string contents)
+    private string WriteEtc(string name, string contents)
     {
-        var path = Path.Combine(_tempDir, name);
+        var path = Path.Combine(_etc, name);
         File.WriteAllText(path, contents);
         return path;
+    }
+
+    private string WriteVendor(string name, string contents)
+    {
+        var path = Path.Combine(_vendor, name);
+        File.WriteAllText(path, contents);
+        return path;
+    }
+
+    private TestDetector NewDetector(bool serviceActive = false, params string[] services)
+    {
+        var svc = services.Length > 0
+            ? services
+            : ["sudo", "sudo-i", "polkit-1", "systemd-run0", "login", "system-auth", "system-login"];
+        return new TestDetector([_etc, _vendor], svc, serviceActive);
     }
 
     [Test]
     public void Detect_ReportsSudoFingerprint_WhenPamFprintdIsActive()
     {
-        var sudo = WriteFixture("sudo",
+        var sudo = WriteEtc("sudo",
             "#%PAM-1.0\nauth       sufficient   pam_fprintd.so\nauth       include      system-auth\n");
 
-        var detector = new FingerprintAuthDetector([sudo]);
-        var result = detector.Detect();
+        var result = NewDetector().Detect();
 
         Assert.That(result.SudoUsesFingerprint, Is.True);
         Assert.That(result.MatchingFiles, Does.Contain(sudo));
@@ -43,11 +62,10 @@ public class FingerprintAuthDetectorTests
     [Test]
     public void Detect_IgnoresCommentedLines()
     {
-        var sudo = WriteFixture("sudo",
+        WriteEtc("sudo",
             "#%PAM-1.0\n#auth       sufficient   pam_fprintd.so\nauth       include      system-auth\n");
 
-        var detector = new FingerprintAuthDetector([sudo]);
-        var result = detector.Detect();
+        var result = NewDetector().Detect();
 
         Assert.That(result.SudoUsesFingerprint, Is.False);
         Assert.That(result.MatchingFiles, Is.Empty);
@@ -56,11 +74,10 @@ public class FingerprintAuthDetectorTests
     [Test]
     public void Detect_ReturnsFalse_WhenNoFprintdLine()
     {
-        var sudo = WriteFixture("sudo",
+        WriteEtc("sudo",
             "#%PAM-1.0\nauth       include      system-auth\naccount    include      system-auth\n");
 
-        var detector = new FingerprintAuthDetector([sudo]);
-        var result = detector.Detect();
+        var result = NewDetector().Detect();
 
         Assert.That(result.SudoUsesFingerprint, Is.False);
         Assert.That(result.MatchingFiles, Is.Empty);
@@ -69,8 +86,7 @@ public class FingerprintAuthDetectorTests
     [Test]
     public void Detect_ReturnsFalse_WhenFileMissing()
     {
-        var detector = new FingerprintAuthDetector([Path.Combine(_tempDir, "does-not-exist")]);
-        var result = detector.Detect();
+        var result = NewDetector().Detect();
 
         Assert.That(result.SudoUsesFingerprint, Is.False);
         Assert.That(result.MatchingFiles, Is.Empty);
@@ -79,13 +95,85 @@ public class FingerprintAuthDetectorTests
     [Test]
     public void Detect_PolkitOnlyHit_DoesNotFlagSudo()
     {
-        var polkit = WriteFixture("polkit-1",
+        var polkit = WriteEtc("polkit-1",
             "#%PAM-1.0\nauth       sufficient   pam_fprintd.so\nauth       include      system-auth\n");
 
-        var detector = new FingerprintAuthDetector([polkit]);
-        var result = detector.Detect();
+        var result = NewDetector().Detect();
 
         Assert.That(result.SudoUsesFingerprint, Is.False);
         Assert.That(result.MatchingFiles, Does.Contain(polkit));
+    }
+
+    [Test]
+    public void Detect_FollowsIncludeIntoSystemAuth_CachyOsShape()
+    {
+        WriteEtc("sudo",
+            "#%PAM-1.0\nauth       include      system-auth\naccount    include      system-auth\nsession    include      system-auth\n");
+        var sysAuth = WriteEtc("system-auth",
+            "auth       sufficient   pam_fprintd.so\nauth       required     pam_unix.so try_first_pass nullok\n");
+
+        var result = NewDetector().Detect();
+
+        Assert.That(result.SudoUsesFingerprint, Is.True);
+        Assert.That(result.MatchingFiles, Does.Contain(sysAuth));
+    }
+
+    [Test]
+    public void Detect_FollowsSubstack()
+    {
+        WriteEtc("sudo", "auth       substack     system-auth\n");
+        var sysAuth = WriteEtc("system-auth", "auth       sufficient   pam_fprintd.so\n");
+
+        var result = NewDetector().Detect();
+
+        Assert.That(result.SudoUsesFingerprint, Is.True);
+        Assert.That(result.MatchingFiles, Does.Contain(sysAuth));
+    }
+
+    [Test]
+    public void Detect_ReadsVendorPamDir_WhenEtcMissing()
+    {
+        var vendorPolkit = WriteVendor("polkit-1",
+            "auth       sufficient   pam_fprintd.so\nauth       include      system-auth\n");
+
+        var result = NewDetector().Detect();
+
+        Assert.That(result.MatchingFiles, Does.Contain(vendorPolkit));
+        Assert.That(result.SudoUsesFingerprint, Is.False);
+    }
+
+    [Test]
+    public void Detect_HandlesLeadingDashOptionalLines()
+    {
+        WriteEtc("sudo", "-auth      sufficient   pam_fprintd.so\n");
+
+        var result = NewDetector().Detect();
+
+        Assert.That(result.SudoUsesFingerprint, Is.True);
+    }
+
+    [Test]
+    public void Detect_FlagsSudoUsage_WhenOnlyServiceIsActive()
+    {
+        var detector = NewDetector(serviceActive: true);
+
+        var result = detector.Detect();
+
+        Assert.That(result.FprintdServiceRunning, Is.True);
+        Assert.That(result.SudoUsesFingerprint, Is.True);
+        Assert.That(result.MatchingFiles, Is.Empty);
+    }
+
+    private sealed class TestDetector : FingerprintAuthDetector
+    {
+        private readonly bool _serviceActive;
+
+        public TestDetector(string[] roots, string[] services, bool serviceActive)
+            : base(roots, services)
+        {
+            _serviceActive = serviceActive;
+        }
+
+        public override bool FprintdServiceActive() => _serviceActive;
     }
 }
