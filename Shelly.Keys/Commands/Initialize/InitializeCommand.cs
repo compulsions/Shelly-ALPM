@@ -30,7 +30,7 @@ public class InitializeCommand : AsyncCommand<Settings>
 
     private const UnixFileMode FilePermissions = UserRead | UserWrite | GroupRead | OtherRead;
 
-    private static List<string> urlStart = ["hkp", "hkps", "hkpms", "ldap", "finger", "kdns"];
+    private static readonly List<string> urlStart = ["hkp", "hkps", "hkpms", "ldap", "finger", "kdns"];
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
@@ -342,11 +342,12 @@ public class InitializeCommand : AsyncCommand<Settings>
             }
 
             await File.AppendAllLinesAsync(gpgConfiguration.FullName, writeText);
-            if (keyServer != null && ValidateUrl(keyServer))
-            {
-                await File.AppendAllLinesAsync(gpgConfiguration.FullName,
-                    [$"keyserver {keyServer}"]);
-            }
+        }
+
+        if (keyServer != null && ValidateUrl(keyServer))
+        {
+            await File.AppendAllLinesAsync(gpgConfiguration.FullName,
+                [$"keyserver {keyServer}"]);
         }
     }
 
