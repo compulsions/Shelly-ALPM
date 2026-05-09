@@ -57,7 +57,7 @@ public class ShellyConfig
     
     public bool NewInstallInitSettings { get; set; } = false;
     
-    public bool RecommendedEnabled { get; set; } = true;
+    public bool RecommendedEnabled { get; set; } = false;
     
     public bool UseSymbolicTray { get; set; } = true;
 
