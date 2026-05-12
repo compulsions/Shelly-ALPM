@@ -6,9 +6,9 @@ using Spectre.Console.Cli;
 
 namespace Shelly_CLI.Commands.Standard;
 
-public class ListInstalledCommand : Command<ListSettings>
+public class ListInstalledCommand : Command<AlpmListSettings>
 {
-    public override int Execute(CommandContext context, ListSettings settings)
+    public override int Execute(CommandContext context, AlpmListSettings settings)
     {
         if (Program.IsUiMode)
         {
@@ -102,7 +102,7 @@ public class ListInstalledCommand : Command<ListSettings>
         return $"{size:0.##} {sizes[order]}";
     }
 
-    private static int HandleUiModeListInstalled(ListSettings settings)
+    private static int HandleUiModeListInstalled(AlpmListSettings settings)
     {
         using var manager = new AlpmManager();
         manager.Initialize(true, showHiddenPackages: settings.ShowHidden);
