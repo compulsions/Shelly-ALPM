@@ -13,7 +13,6 @@ using Shelly.Gtk.Windows.Dialog;
 using ListStore = Gio.ListStore;
 
 // ReSharper disable NotAccessedField.Local
-
 // ReSharper disable CollectionNeverQueried.Local
 
 namespace Shelly.Gtk.Windows.Packages;
@@ -94,7 +93,6 @@ public sealed class PackageInstall(
 
         SetupColumns(checkColumn, _nameColumn, sizeColumn, _versionColumn, _repositoryColumn);
 
-        // Creating sorter
         _nameColumn.Sorter = CustomSorter.New<AlpmPackageGObject>((_, _) => 0);
         _repositoryColumn.Sorter = CustomSorter.New<AlpmPackageGObject>((_, _) => 0);
         _versionColumn.Sorter = CustomSorter.New<AlpmPackageGObject>((_, _) => 0);
