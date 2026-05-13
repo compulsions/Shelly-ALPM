@@ -3,6 +3,7 @@ using Shelly.Gtk.Helpers;
 using Shelly.Gtk.Services;
 using Shelly.Gtk.UiModels;
 using Shelly.Gtk.UiModels.PackageManagerObjects.GObjects;
+using static Shelly.GTK.Resources.Translations;
 
 // ReSharper disable RedundantAssignment
 
@@ -89,7 +90,7 @@ public sealed class ShellySearch(
         spinnerBox.SetVexpand(true);
         _searchSpinner = Spinner.New();
         _searchSpinner.SetSizeRequest(48, 48);
-        var searchingLabel = Label.New("Searching...");
+        var searchingLabel = Label.New(T("Searching..."));
         spinnerBox.Append(_searchSpinner);
         spinnerBox.Append(searchingLabel);
 
@@ -186,7 +187,7 @@ public sealed class ShellySearch(
             var installedIcon = (Image)label.GetNextSibling()!;
             label.SetText(pkg.Name);
             installedIcon.Visible = pkg.IsInstalled;
-            installedIcon.TooltipText = "Installed";
+            installedIcon.TooltipText = T("Installed");
 
             pkgObj.OnIsInstalledChanged += OnInstalledChanged;
             _installedBinding[listItem] = OnInstalledChanged;
@@ -349,7 +350,7 @@ public sealed class ShellySearch(
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Search error: {ex.Message}");
+            Console.WriteLine(T($"Search error: {ex.Message}"));
         }
         finally
         {
@@ -480,7 +481,7 @@ public sealed class ShellySearch(
 
         try
         {
-            lockoutService.Show($"Installing...");
+            lockoutService.Show(T($"Installing..."));
             var standard = selected.Where(x => x.PackageType == PackageType.Standard).Select(x => x.Name).ToList();
             var aur = selected.Where(x => x.PackageType == PackageType.Aur).Select(x => x.Name).ToList();
             var flatpak = selected.Where(x => x.PackageType == PackageType.Flatpak).Select(x => x.Id).ToList();
@@ -518,7 +519,7 @@ public sealed class ShellySearch(
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Failed to install packages: {e.Message}");
+            Console.WriteLine(T($"Failed to install packages: {e.Message}"));
         }
         finally
         {
@@ -527,13 +528,13 @@ public sealed class ShellySearch(
             if (installFailed)
             {
                 args = new ToastMessageEventArgs(
-                    $"Install for {selected.Count} package(s) was unsuccessful."
+                    T($"Install for {selected.Count} package(s) was unsuccessful.")
                 );
             }
             else
             {
                 args = new ToastMessageEventArgs(
-                    $"Installed {selected.Count} Package(s)"
+                    T($"Installed {selected.Count} Package(s)")
                 );
             }
 
@@ -580,7 +581,7 @@ public sealed class ShellySearch(
 
         try
         {
-            lockoutService.Show("Removing...");
+            lockoutService.Show(T("Removing..."));
 
             var standard = selected.Where(x => x.PackageType == PackageType.Standard).Select(x => x.Name).ToList();
             var aur = selected.Where(x => x.PackageType == PackageType.Aur).Select(x => x.Name).ToList();
@@ -600,14 +601,14 @@ public sealed class ShellySearch(
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Failed to remove packages: {e.Message}");
+            Console.WriteLine(T($"Failed to remove packages: {e.Message}"));
         }
         finally
         {
             lockoutService.Hide();
 
             var args = new ToastMessageEventArgs(
-                $"Removed {selected.Count} Package(s)"
+                T($"Removed {selected.Count} Package(s)")
             );
             genericQuestionService.RaiseToastMessage(args);
 

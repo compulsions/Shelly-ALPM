@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shelly-ui 2.2.4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-13 08:21-0400\n"
+"POT-Creation-Date: 2026-05-13 09:56-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,6 +131,18 @@ msgstr ""
 msgid "Updated {0} Package(s)"
 msgstr ""
 
+msgid "Shelly is an Arch Linux package manager"
+msgstr ""
+
+msgid "Seafoam Labs Website"
+msgstr ""
+
+msgid "Project Leads"
+msgstr ""
+
+msgid "Maintainers"
+msgstr ""
+
 msgid "Select"
 msgstr ""
 
@@ -168,6 +180,12 @@ msgid "Select Optional Dependencies"
 msgstr ""
 
 msgid "System Question"
+msgstr ""
+
+msgid "Arch Linux News"
+msgstr ""
+
+msgid "No news available"
 msgstr ""
 
 msgid "package"
@@ -235,39 +253,6 @@ msgstr ""
 msgid "Cache clean failed: {0}"
 msgstr ""
 
-msgid "Authentication Required"
-msgstr ""
-
-msgid "Password needed to execute: {0}."
-msgstr ""
-
-msgid "Authenticate"
-msgstr ""
-
-msgid "Incorrect password. Try again."
-msgstr ""
-
-msgid "What's New"
-msgstr ""
-
-msgid "Version History"
-msgstr ""
-
-msgid "Version {0}"
-msgstr ""
-
-msgid "Shelly is an Arch Linux package manager"
-msgstr ""
-
-msgid "Seafoam Labs Website"
-msgstr ""
-
-msgid "Project Leads"
-msgstr ""
-
-msgid "Maintainers"
-msgstr ""
-
 msgid "Fingerprint Disable Instructions"
 msgstr ""
 
@@ -289,10 +274,25 @@ msgstr ""
 msgid "Operation Complete"
 msgstr ""
 
-msgid "Arch Linux News"
+msgid "Authentication Required"
 msgstr ""
 
-msgid "No news available"
+msgid "Password needed to execute: {0}."
+msgstr ""
+
+msgid "Authenticate"
+msgstr ""
+
+msgid "Incorrect password. Try again."
+msgstr ""
+
+msgid "What's New"
+msgstr ""
+
+msgid "Version History"
+msgstr ""
+
+msgid "Version {0}"
 msgstr ""
 
 msgid "Package installation failed"
@@ -307,7 +307,37 @@ msgstr ""
 msgid "Any"
 msgstr ""
 
+msgid "Repository"
+msgstr ""
+
 msgid "Size"
+msgstr ""
+
+msgid "Installed"
+msgstr ""
+
+msgid "Packages to Upgrade"
+msgstr ""
+
+msgid "Export Shelly install log"
+msgstr ""
+
+msgid "Exported Shelly install log"
+msgstr ""
+
+msgid "Failed to export Shelly install log"
+msgstr ""
+
+msgid "Install Local Package"
+msgstr ""
+
+msgid "Local package files (\"*.xz\", \"*.gz\", \"*.zst\")"
+msgstr ""
+
+msgid "Installing local package..."
+msgstr ""
+
+msgid "Installed local package"
 msgstr ""
 
 msgid "Package Files ({0})"
@@ -326,9 +356,6 @@ msgid "Download"
 msgstr ""
 
 msgid "Size Diff"
-msgstr ""
-
-msgid "Repository"
 msgstr ""
 
 msgid "Partial Update Warning"
@@ -364,32 +391,128 @@ msgid ""
 "{0}"
 msgstr ""
 
-msgid "Installed"
+msgid "Installing flatpak..."
 msgstr ""
 
-msgid "Packages to Upgrade"
+msgid "Reboot required after flatpak installation."
 msgstr ""
 
-msgid "Export Shelly install log"
+msgid "Failed to install flatpak"
 msgstr ""
 
-msgid "Exported Shelly install log"
+msgid "Searching..."
 msgstr ""
 
-msgid "Failed to export Shelly install log"
+msgid ""
+"No recommendations found. Please check your internet connection and try "
+"again."
 msgstr ""
 
-msgid "Install Local Package"
+msgid "Already installed"
 msgstr ""
 
-msgid "Local package files (\"*.xz\", \"*.gz\", \"*.zst\")"
+msgid "Install "
 msgstr ""
 
-msgid "Installing local package..."
+msgid "Package is already installed"
 msgstr ""
 
-msgid "Installed local package"
+msgid "Installing package..."
+msgstr ""
+
+msgid "Package installed successfully"
 msgstr ""
 
 msgid "color-scheme"
+msgstr ""
+
+msgid "Search packages..."
+msgstr ""
+
+msgid "Use chroot"
+msgstr ""
+
+msgid "Build packages in a clean chroot environment"
+msgstr ""
+
+msgid "Run checks"
+msgstr ""
+
+msgid "Run the --check function during package build (installs checkdepends)"
+msgstr ""
+
+msgid "Install Aur Package(s)"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "refresh"
+msgstr ""
+
+msgid "Clean Uninstall"
+msgstr ""
+
+msgid "Show Hidden"
+msgstr ""
+
+msgid "Show packages in the IgnorePkg list from pacman.conf"
+msgstr ""
+
+msgid "Remove Aur Package(s)"
+msgstr ""
+
+msgid ""
+"Run the --check function during package build (installs checkdepends)\n"
+msgstr ""
+
+msgid "Update Aur Package(s)"
+msgstr ""
+
+msgid "Please wait while we update your system."
+msgstr ""
+
+msgid "Sync"
+msgstr ""
+
+msgid "Group Filter"
+msgstr ""
+
+msgid "Remove Configs"
+msgstr ""
+
+msgid "Remove Selected"
+msgstr ""
+
+msgid "Package Name"
+msgstr ""
+
+msgid "Package Group Filter"
+msgstr ""
+
+msgid "Install Local Packages"
+msgstr ""
+
+msgid "Install Local"
+msgstr ""
+
+msgid "Perform Upgrade"
+msgstr ""
+
+msgid "Perform a full system upgrade with install (-u)"
+msgstr ""
+
+msgid Show packages in the IgnorePkg list from pacman.conf\n"
+msgstr ""
+
+msgid "Install Selected"
+msgstr ""
+
+msgid "Update Selected"
+msgstr ""
+
+msgid "Size Difference"
+msgstr ""
+
+msgid "Old Version"
 msgstr ""
