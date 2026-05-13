@@ -30,7 +30,7 @@ public static partial class LocalManager
         Directory.CreateDirectory(installDir);
 
         var installedBinaries = new List<string>();
-        var foundIcons = new Dictionary<string, string>();
+        var foundIcons = new SortedDictionary<string, string>();
 
         await using var fileStream = File.OpenRead(filePath);
         await using Stream decompressedStream = extension switch
@@ -100,7 +100,8 @@ public static partial class LocalManager
         {
             var iconName = "application-x-executable";
 
-            if (!packageName.Contains(binaryName, StringComparison.OrdinalIgnoreCase)) continue;
+            if (!CleanInvalidNames(packageName)
+                    .Contains(binaryName, StringComparison.OrdinalIgnoreCase)) continue;
 
             if (foundIcons.Count > 0)
             {
@@ -244,6 +245,8 @@ public static partial class LocalManager
                 if (await IsElfBinary(fs)) pkgBins.Add(info);
             }
 
+            List<FileInfo> desktopBins = [];
+
             foreach (var pkgBin in pkgBins)
             {
                 var usrBin = new FileInfo(Path.Combine("/usr/bin", pkgBin.Name));
@@ -253,41 +256,48 @@ public static partial class LocalManager
                 Console.WriteLine($"Removing {pkgBin.Name} from {usrBin.FullName}");
                 File.Delete(usrBin.FullName);
 
-                if (!dir.Name.Contains(pkgBin.Name, StringComparison.InvariantCultureIgnoreCase)) continue;
+                if (!CleanInvalidNames(dir.Name)
+                        .Contains(pkgBin.Name, StringComparison.InvariantCultureIgnoreCase)) continue;
 
                 var desktopFilePath =
                     Path.Combine(DesktopDir, $"{Path.GetFileNameWithoutExtension(pkgBin.Name)}.desktop");
                 Console.WriteLine($"Removing {desktopFilePath}");
                 File.Delete(desktopFilePath);
+                desktopBins.Add(pkgBin);
             }
 
             var iconInfos = pkgInfos
                 .Where(info => IsIcon(info.Extension.ToLower()))
+                .OrderBy(info => info.Name)
                 .ToList();
 
-            foreach (var icon in iconInfos)
+            foreach (var desktopBin in desktopBins)
             {
-                var iconName = Path.GetFileNameWithoutExtension(icon.Name).ToLower();
-                var extension = icon.Extension.ToLower();
-                string destDir;
-                if (extension == ".svg")
+                foreach (var icon in iconInfos)
                 {
-                    destDir = "/usr/share/icons/hicolor/scalable/apps";
-                }
-                else
-                {
-                    var sizeMatch = ImageSizeRegex().Match(icon.Name);
-                    var size = sizeMatch.Success && int.TryParse(sizeMatch.Groups[1].Value, out var s)
-                        ? s
-                        : 256;
-                    destDir = $"/usr/share/icons/hicolor/{size}x{size}/apps";
-                }
+                    var extension = icon.Extension.ToLower();
+                    string destDir;
+                    if (extension == ".svg")
+                    {
+                        destDir = "/usr/share/icons/hicolor/scalable/apps";
+                    }
+                    else
+                    {
+                        var sizeMatch = ImageSizeRegex().Match(icon.Name);
+                        var size = sizeMatch.Success && int.TryParse(sizeMatch.Groups[1].Value, out var s)
+                            ? s
+                            : 256;
+                        destDir = $"/usr/share/icons/hicolor/{size}x{size}/apps";
+                    }
 
-                var destPath = Path.Combine(destDir, $"{iconName}{extension}");
-                if (!File.Exists(destPath)) continue;
+                    var iconName = desktopBin.Name;
+                    var destPath = Path.Combine(destDir, $"{iconName}{extension}");
+                    Console.WriteLine($"Trying {destPath}");
+                    if (!File.Exists(destPath)) continue;
 
-                Console.WriteLine($"Removing icon {destPath}");
-                File.Delete(destPath);
+                    Console.WriteLine($"Removing icon {destPath}");
+                    File.Delete(destPath);
+                }
             }
 
             // Delete package directory
