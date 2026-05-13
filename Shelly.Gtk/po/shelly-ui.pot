@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shelly-ui 2.2.4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 08:39+0000\n"
+"POT-Creation-Date: 2026-05-12 21:05-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,16 +15,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "Version"
+msgid "Any"
 msgstr ""
 
-msgid "Repository"
+msgid "Close details"
+msgstr ""
+
+msgid "Version"
 msgstr ""
 
 msgid "Size"
 msgstr ""
 
-msgid "URL"
+msgid "URL:"
 msgstr ""
 
 msgid "Depends"
@@ -45,13 +48,69 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
-msgid "Close details"
+msgid "Package Files ({0})"
+msgstr ""
+
+msgid "Remove Packages?"
+msgstr ""
+
+#: Shelly.Gtk/Windows/Packages/PackageManagement.cs:787
+msgid "Removing..."
+msgstr ""
+
+msgid "Removed {0} Package(s)"
+msgstr ""
+
+msgid "<span size='large'>System packages are up to date</span>"
+msgstr ""
+
+msgid "Current"
+msgstr ""
+
+msgid "New"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Size Diff"
+msgstr ""
+
+msgid "Repository"
+msgstr ""
+
+msgid "Partial Update Warning"
+msgstr ""
+
+msgid "It is not advised you do partial system updates. Are you sure you want to continue?"
+msgstr ""
+
+msgid "Update Packages?"
+msgstr ""
+
+
+msgid "It is unadvised to not update all packages at once. Are you sure you want to continue?"
+msgstr ""
+
+msgid "Updating..."
+msgstr ""
+
+msgid "Reboot Required"
+msgstr ""
+
+msgid "A full system reboot is required for updates to take effect.\n\nWould you like to reboot now?"
+msgstr ""
+
+msgid "Service Restart Failures"
+msgstr ""
+
+msgid "The following services failed to restart automatically:\n{0}"
+msgstr ""
+
+msgid "Updated {0} Package(s)"
 msgstr ""
 
 msgid "Installed"
-msgstr ""
-
-msgid "Any"
 msgstr ""
 
 msgid "Packages to Upgrade"
@@ -90,7 +149,46 @@ msgstr ""
 msgid "Installed local package"
 msgstr ""
 
+msgid "color-scheme"
+msgstr ""
+
+msgid "Please wait while we update your system."
+msgstr ""
+
 msgid "Search packages..."
+msgstr ""
+
+msgid "Sync"
+msgstr ""
+
+msgid "Group Filter"
+msgstr ""
+
+msgid "Clean Uninstall"
+msgstr ""
+
+msgid "Remove Configs"
+msgstr ""
+
+msgid "Show Hidden"
+msgstr ""
+
+msgid "Show packages in the IgnorePkg list from pacman.conf"
+msgstr ""
+
+msgid "Remove Selected"
+msgstr ""
+
+msgid "Package Name"
+msgstr ""
+
+msgid "Update Selected"
+msgstr ""
+
+msgid "Size Difference"
+msgstr ""
+
+msgid "Old Version"
 msgstr ""
 
 msgid "Package Group Filter"
@@ -108,10 +206,8 @@ msgstr ""
 msgid "Perform a full system upgrade with install (-u)"
 msgstr ""
 
-msgid "Show Hidden"
-msgstr ""
-
-msgid "Show packages in the IgnorePkg list from pacman.conf"
+msgid ""
+"Show packages in the IgnorePkg list from pacman.conf\n"
 msgstr ""
 
 msgid "Install Selected"

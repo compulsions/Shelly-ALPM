@@ -363,7 +363,7 @@ public class PackageInstall(
         {
             var row = Box.New(Orientation.Horizontal, 12);
             row.MarginBottom = 4;
-            var labelWidget = Label.New(T("URL") + ":");
+            var labelWidget = Label.New(T("URL:"));
             labelWidget.AddCssClass("dim-label");
             labelWidget.Halign = Align.Start;
             labelWidget.Valign = Align.Start;
