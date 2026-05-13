@@ -15,6 +15,8 @@ namespace Shelly_CLI;
 [JsonSerializable(typeof(AlpmPackageUpdateDto))]
 [JsonSerializable(typeof(List<AlpmPackageDto>))]
 [JsonSerializable(typeof(AlpmPackageDto))]
+[JsonSerializable(typeof(List<LocalPackageDto>))]
+[JsonSerializable(typeof(LocalPackageDto))]
 [JsonSerializable(typeof(List<AurPackageDto>))]
 [JsonSerializable(typeof(AurPackageDto))]
 [JsonSerializable(typeof(List<AurUpdateDto>))]
@@ -36,6 +38,4 @@ namespace Shelly_CLI;
 [JsonSerializable(typeof(FlatpakRemoteDto))]
 [JsonSerializable(typeof(List<PacfileRecord>))]
 [JsonSerializable(typeof(PacfileRecord))]
-internal partial class ShellyCLIJsonContext : JsonSerializerContext
-{
-}
+internal partial class ShellyCLIJsonContext : JsonSerializerContext;

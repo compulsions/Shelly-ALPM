@@ -34,7 +34,7 @@ public class ListLocalInstalledCommand : Command<ListSettings>
         if (settings.JsonOutput)
         {
             var sortedList = sortedPackages.ToList();
-            var json = JsonSerializer.Serialize(sortedList, ShellyCLIJsonContext.Default.ListAlpmPackageDto);
+            var json = JsonSerializer.Serialize(sortedList, ShellyCLIJsonContext.Default.ListLocalPackageDto);
             // Write directly to stdout stream to bypass Spectre.Console redirection
             using var stdout = Console.OpenStandardOutput();
             using var writer = new StreamWriter(stdout, System.Text.Encoding.UTF8);
@@ -96,7 +96,7 @@ public class ListLocalInstalledCommand : Command<ListSettings>
         if (settings.JsonOutput)
         {
             var sortedList = sortedPackages.ToList();
-            var json = JsonSerializer.Serialize(sortedList, ShellyCLIJsonContext.Default.ListAlpmPackageDto);
+            var json = JsonSerializer.Serialize(sortedList, ShellyCLIJsonContext.Default.ListLocalPackageDto);
             using var stdout = Console.OpenStandardOutput();
             using var writer = new StreamWriter(stdout, System.Text.Encoding.UTF8);
             writer.WriteLine(json);

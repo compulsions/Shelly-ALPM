@@ -4,11 +4,13 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using SharpCompress.Compressors.Xz;
+using Shelly_CLI.Commands.Standard;
 using Spectre.Console;
 using ZstdSharp;
 
 namespace Shelly_CLI.Utility;
 
+// TODO: Move to PackageManager
 public static class LocalManager
 {
     private const string InstallDir = "/opt/shelly";
