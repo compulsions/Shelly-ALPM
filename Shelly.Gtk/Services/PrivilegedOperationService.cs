@@ -97,7 +97,7 @@ public class PrivilegedOperationService : IPrivilegedOperationService
     public async Task<OperationResult> InstallLocalPackageAsync(string filePath)
     {
         var result = await ExecutePrivilegedWithNoConfirmCheck("Install local package", "install-local", "--location",
-            filePath);
+            $"\"{filePath}\"");
         if (result.Success) _dirtyService.MarkDirty(DirtyScopes.Native);
         return result;
     }
@@ -132,7 +132,7 @@ public class PrivilegedOperationService : IPrivilegedOperationService
     public Task<OperationResult> RemoveLocalPackagesAsync(IEnumerable<string> packages)
     {
         var packageArgs = string.Join(" ", packages);
-        return ExecutePrivilegedWithNoConfirmCheck("Remove local packages", "remove-local", packageArgs);
+        return ExecutePrivilegedWithNoConfirmCheck("Remove local packages", "remove-local", $"\"{packageArgs}\"");
     }
 
     public async Task<OperationResult> UpdatePackagesAsync(IEnumerable<string> packages)
