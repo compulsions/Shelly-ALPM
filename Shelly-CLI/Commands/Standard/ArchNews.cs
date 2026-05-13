@@ -27,12 +27,8 @@ public class ArchNews : AsyncCommand<ArchNewsSettings>
                 var feed = await GetRssFeedAsync("https://archlinux.org/feeds/news/");
                 if (settings.Json)
                 {
-                    var json = JsonSerializer.Serialize(feed, ShellyCLIJsonContext.Default.ListRssModel);
-                    await using var stdout = System.Console.OpenStandardOutput();
-                    await using var writer = new System.IO.StreamWriter(stdout, System.Text.Encoding.UTF8);
-                    await writer.WriteLineAsync(json);
-                    await writer.FlushAsync();
-                    CacheFeed(feed);
+                    Console.Error.WriteLine(feed.Count);
+                    await OutputFeed(feed);
                 }
                 else
                 {
@@ -43,9 +39,9 @@ public class ArchNews : AsyncCommand<ArchNewsSettings>
                         AnsiConsole.MarkupLine($"[blue]{item.Link.EscapeMarkup()}[/]");
                         AnsiConsole.MarkupLine($"[white]{item.Description.EscapeMarkup()}[/]");
                     }
-
-                    CacheFeed(feed);
                 }
+
+                CacheFeed(feed);
             }
             catch (Exception e)
             {
@@ -62,11 +58,7 @@ public class ArchNews : AsyncCommand<ArchNewsSettings>
 
             if (settings.Json)
             {
-                var json = JsonSerializer.Serialize(newFeed, ShellyCLIJsonContext.Default.ListRssModel);
-                await using var stdout = System.Console.OpenStandardOutput();
-                await using var writer = new System.IO.StreamWriter(stdout, System.Text.Encoding.UTF8);
-                await writer.WriteLineAsync(json);
-                await writer.FlushAsync();
+                await OutputFeed(newFeed);
                 if (newFeed.Count > 0) CacheFeed(feed);
                 return 0;
             }
@@ -126,4 +118,10 @@ public class ArchNews : AsyncCommand<ArchNewsSettings>
     }
 
 
+    private static async Task OutputFeed(List<RssModel> feed)
+    {
+        await using var stdout = Console.OpenStandardOutput();
+        await MemoryPackSerializer.SerializeAsync(stdout, feed);
+        await stdout.FlushAsync();
+    }
 }
