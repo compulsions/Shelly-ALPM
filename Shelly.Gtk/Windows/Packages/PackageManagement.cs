@@ -21,7 +21,9 @@ public sealed class PackageManagement(
     IConfigService configService,
     IGenericQuestionService genericQuestionService,
     IIconResolverService iconResolverService,
-    IDirtyService dirtyService) : IShellyWindow, IReloadable
+    IDirtyService dirtyService,
+    RemoveLocal removeLocal
+) : IShellyWindow, IReloadable
 {
     private DirtySubscription? _sub;
     public string[] ListensTo => [DirtyScopes.Native, DirtyScopes.NativeInstalled];
@@ -36,6 +38,7 @@ public sealed class PackageManagement(
     private readonly Dictionary<ColumnViewCell, (SignalHandler<CheckButton> OnToggled, EventHandler OnExternalToggle)>
         _checkBinding = [];
 
+    private Box _box = null!;
     private SearchEntry _searchEntry = null!;
     private CheckButton _cascadeDeleteCheck = null!;
     private CheckButton _removeConfigsCheck = null!;
@@ -52,7 +55,6 @@ public sealed class PackageManagement(
 
     private ColumnViewSorter _columnViewSorter = null!;
 
-
     private Revealer _detailRevealer = null!;
     private Box _detailBox = null!;
     private HashSet<string> _installedPackageNames = [];
@@ -60,7 +62,7 @@ public sealed class PackageManagement(
     public Widget CreateWindow()
     {
         var builder = Builder.NewFromString(ResourceHelper.LoadUiFile("UiFiles/Package/PackageManagement.ui"), -1);
-        var box = (Box)builder.GetObject("PackageManagement")!;
+        _box = (Box)builder.GetObject("PackageManagement")!;
         var columnView = (ColumnView)builder.GetObject("package_grid")!;
         _searchEntry = (SearchEntry)builder.GetObject("search_entry")!;
         _cascadeDeleteCheck = (CheckButton)builder.GetObject("cascade_delete_check")!;
@@ -77,6 +79,7 @@ public sealed class PackageManagement(
         _versionColumn.Resizable = true;
 
         var refreshButton = (Button)builder.GetObject("sync_button")!;
+        var localRemoveButton = (Button)builder.GetObject("remove_local_button")!;
         _removeButton = (Button)builder.GetObject("remove_button")!;
         _removeButton.SetSensitive(false);
 
@@ -137,7 +140,7 @@ public sealed class PackageManagement(
             return true;
         });
 
-        box.AddController(shortcutController);
+        _box.AddController(shortcutController);
         shortcutController.AddShortcut(Shortcut.New(ShortcutTrigger.ParseString("<Control>f"), action));
 
         columnView.OnRealize += (_, _) => { Reload(); };
@@ -169,6 +172,7 @@ public sealed class PackageManagement(
         };
         _removeButton.OnClicked += (_, _) => { _ = RemoveSelectedAsync(); };
         refreshButton.OnClicked += (_, _) => { Reload(); };
+        localRemoveButton.OnClicked += async (_, _) => { await OpenRemoveLocal(); };
         _showHiddenCheck.OnToggled += (_, _) => { Reload(); };
         _groupDropDown.OnNotify += (_, args) =>
         {
@@ -180,7 +184,17 @@ public sealed class PackageManagement(
         };
 
         _sub = DirtySubscription.Attach(dirtyService, this);
-        return box;
+        return _box;
+    }
+
+    private async Task OpenRemoveLocal()
+    {
+        using var removeLocalBox = (Box)removeLocal.CreateWindow();
+        var width = (int)Math.Max(_box.GetWidth() * 0.5, 700);
+        removeLocalBox.SetSizeRequest(width, -1);
+        var eventArgs = new GenericDialogEventArgs(removeLocalBox);
+        genericQuestionService.RaiseDialog(eventArgs);
+        await eventArgs.ResponseTask;
     }
 
     public void Reload()
@@ -807,5 +821,6 @@ public sealed class PackageManagement(
         _checkBinding.Clear();
         _groups.Clear();
         _installedPackageNames.Clear();
+        removeLocal.Dispose();
     }
 }

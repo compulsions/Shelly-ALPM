@@ -35,6 +35,26 @@
                     </object>
                 </child>
                 <child>
+                    <object class="GtkButton" id="remove_local_button">
+                        <property name="tooltip-text">Remove Local Packages</property>
+                        <child>
+                            <object class="GtkBox">
+                                <property name="spacing">5</property>
+                                <child>
+                                    <object class="GtkImage">
+                                        <property name="icon-name">user-trash-symbolic</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel">
+                                        <property name="label">Remove Local</property>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
                     <object class="GtkBox">
                         <property name="hexpand">true</property>
                     </object>
