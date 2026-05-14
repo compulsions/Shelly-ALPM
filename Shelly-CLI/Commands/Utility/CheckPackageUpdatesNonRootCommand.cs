@@ -181,14 +181,13 @@ public class CheckPackageUpdatesNonRootCommand : AsyncCommand<CheckPackageUpdate
     private static async Task<int> HandleUiModeCheckUpdates(CheckPackageUpdatesNonRootSettings settings)
     {
         var alpmManager = new AlpmManager();
-        List<AlpmPackageUpdateDto> alpmPackages = [];
+        List<AlpmPackageUpdateDto> alpmPackages;
         var aurManager = new AurPackageManager();
         List<AurUpdateDto> aurPackages = [];
         var flatPakManager = new FlatpakManager();
         List<FlatpakPackageDto> flatpakPackages = [];
         var dbPath = XdgPaths.ShellyCache("db");
         Directory.CreateDirectory(dbPath);
-        Console.Error.WriteLine(dbPath);
 
         if (settings.JsonOutput)
         {
@@ -207,7 +206,7 @@ public class CheckPackageUpdatesNonRootCommand : AsyncCommand<CheckPackageUpdate
             syncModel.Packages = syncPackageModels;
             if (settings.CheckAur)
             {
-                aurManager.Initialize(false, true, false, tempPath: dbPath);
+                await aurManager.Initialize(false, true, false, tempPath: dbPath);
                 aurPackages = await aurManager.GetPackagesNeedingUpdate();
                 aurManager.Dispose();
                 List<SyncAurModel> aurPackageModels = [];
