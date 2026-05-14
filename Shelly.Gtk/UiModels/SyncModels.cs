@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
+using MemoryPack;
 
 namespace Shelly.Gtk.UiModels;
 
-public class SyncModel
+[MemoryPackable]
+public partial class SyncModel
 {
     public List<SyncPackageModel> Packages { get; set; } = [];
     public List<SyncAurModel> Aur { get; set; } = [];
@@ -11,34 +13,33 @@ public class SyncModel
     public int TotalPackageCount => Packages.Count + Aur.Count + Flatpaks.Count;
 }
 
-public class SyncPackageModel
+[MemoryPackable]
+public partial class SyncPackageModel
 {
     public string Name { get; set; } = string.Empty;
 
     public string Version { get; set; } = string.Empty;
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    
     public string? OldVersion { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DownloadSize { get; set; }
 }
 
-public class SyncAurModel
+[MemoryPackable]
+public partial class SyncAurModel
 {
     public string Name { get; set; } = string.Empty;
 
     public string Version { get; set; } = string.Empty;
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    
     public string? OldVersion { get; set; }
 }
 
-public class SyncFlatpakModel
+[MemoryPackable]
+public partial class SyncFlatpakModel
 {
     public string Id { get; set; } = string.Empty;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Name { get; set; }
 
     public string Version { get; set; } = string.Empty;

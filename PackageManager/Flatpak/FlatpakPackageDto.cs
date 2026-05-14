@@ -22,7 +22,7 @@ public partial class FlatpakPackageDto
     
     public List<string> Categories { get; set; } = [];
     
-    public string remote { get; set; } = string.Empty;
+    public string Remote { get; set; } = string.Empty;
 
     public List<string> Permissions { get; set; } = [];
 }

@@ -1,8 +1,10 @@
+using MemoryPack;
 using Shelly.Gtk.Enums;
 
 namespace Shelly.Gtk.UiModels.AppImage;
 
-public class AppImageDto
+[MemoryPackable]
+public partial class AppImageDto
 {
     public string Name { get; set; } = string.Empty;
     public string DesktopName { get; set; } = string.Empty;
