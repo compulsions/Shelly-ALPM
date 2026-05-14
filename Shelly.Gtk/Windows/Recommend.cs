@@ -119,7 +119,7 @@ public class Recommend(
 
                 var sectionBox = Box.New(Orientation.Vertical, 6);
 
-                var label = Label.New(category.GetDescription());
+                var label = Label.New(T(category.GetDescription()));
                 label.SetHalign(Align.Start);
                 label.AddCssClass("title-4");
 

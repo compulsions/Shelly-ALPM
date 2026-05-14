@@ -36,7 +36,7 @@ public sealed class ShellySearch(
     public Widget CreateWindow()
     {
         var builder = Builder.NewFromString(ResourceHelper.LoadUiFile("UiFiles/ShellySearchWindow.ui"), -1);
-
+        builder.TranslationDomain = Domain;
         var box = (Box)builder.GetObject("ShellySearchWindow")!;
         var columnView = (ColumnView)builder.GetObject("package_grid")!;
         _installButton = (Button)builder.GetObject("install_button")!;
@@ -350,7 +350,7 @@ public sealed class ShellySearch(
         }
         catch (Exception ex)
         {
-            Console.WriteLine(T($"Search error: {ex.Message}"));
+            Console.WriteLine(T("Search error: {0}", ex.Message));
         }
         finally
         {
@@ -519,7 +519,7 @@ public sealed class ShellySearch(
         }
         catch (Exception e)
         {
-            Console.WriteLine(T($"Failed to install packages: {e.Message}"));
+            Console.WriteLine(T("Failed to install packages: {0}", e.Message));
         }
         finally
         {
@@ -528,13 +528,13 @@ public sealed class ShellySearch(
             if (installFailed)
             {
                 args = new ToastMessageEventArgs(
-                    T($"Install for {selected.Count} package(s) was unsuccessful.")
+                    T("Install for {0} package(s) was unsuccessful.", selected.Count)
                 );
             }
             else
             {
                 args = new ToastMessageEventArgs(
-                    T($"Installed {selected.Count} Package(s)")
+                    T("Installed {0} Package(s)", selected.Count)
                 );
             }
 
@@ -601,14 +601,14 @@ public sealed class ShellySearch(
         }
         catch (Exception e)
         {
-            Console.WriteLine(T($"Failed to remove packages: {e.Message}"));
+            Console.WriteLine(T("Failed to remove packages: {0}", e.Message));
         }
         finally
         {
             lockoutService.Hide();
 
             var args = new ToastMessageEventArgs(
-                T($"Removed {selected.Count} Package(s)")
+                T("Removed {0} Package(s)", selected.Count)
             );
             genericQuestionService.RaiseToastMessage(args);
 
