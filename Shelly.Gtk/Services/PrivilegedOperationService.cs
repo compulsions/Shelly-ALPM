@@ -111,7 +111,7 @@ public class PrivilegedOperationService : IPrivilegedOperationService
         return result;
     }
 
-    public async Task<OperationResult> RemovePackagesAsync(IEnumerable<string> packages, bool isCascade, bool isCleanup)
+    public async Task<OperationResult> RemovePackagesAsync(IEnumerable<string> packages, bool isCascade, bool isCleanup, bool removeOptionalDeps)
     {
         var packageArgs = string.Join(" ", packages);
         if (isCascade)
@@ -122,6 +122,11 @@ public class PrivilegedOperationService : IPrivilegedOperationService
         if (isCleanup)
         {
             packageArgs += " -r";
+        }
+
+        if (removeOptionalDeps)
+        {
+            packageArgs += " -o";
         }
 
         var result = await ExecutePrivilegedWithNoConfirmCheck("Remove packages", "remove", packageArgs);

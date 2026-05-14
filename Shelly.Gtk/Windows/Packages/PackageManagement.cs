@@ -46,6 +46,7 @@ public class PackageManagement(
     private SearchEntry _searchEntry = null!;
     private CheckButton _cascadeDeleteCheck = null!;
     private CheckButton _removeConfigsCheck = null!;
+    private CheckButton _removeOptDepsCheck = null!;
     private CheckButton _showHiddenCheck = null!;
     private Button _refreshButton = null!;
     private Button _removeButton = null!;
@@ -77,6 +78,7 @@ public class PackageManagement(
         _searchEntry = (SearchEntry)builder.GetObject("search_entry")!;
         _cascadeDeleteCheck = (CheckButton)builder.GetObject("cascade_delete_check")!;
         _removeConfigsCheck = (CheckButton)builder.GetObject("remove_configs_check")!;
+        _removeOptDepsCheck = (CheckButton)builder.GetObject("remove_optdeps_check")!;
         _showHiddenCheck = (CheckButton)builder.GetObject("show_hidden_check")!;
 
         _checkColumn = (ColumnViewColumn)builder.GetObject("check_column")!;
@@ -785,8 +787,9 @@ public class PackageManagement(
             {
                 lockoutService.Show($"Removing...");
                 var result = await privilegedOperationService.RemovePackagesAsync(selectedPackages,
-                    _cascadeDeleteCheck.Active,
-                    _removeConfigsCheck.Active);
+                    isCascade: _cascadeDeleteCheck.Active,
+                    isCleanup: _removeConfigsCheck.Active,
+                    removeOptionalDeps: _removeOptDepsCheck.Active);
                 if (result.Success)
                 {
                     var args = new ToastMessageEventArgs(
