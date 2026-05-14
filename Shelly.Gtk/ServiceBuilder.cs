@@ -41,7 +41,6 @@ public static class ServiceBuilder
         collection.AddTransient<FlatpakInstall>();
         collection.AddTransient<FlatpakUpdate>();
         collection.AddTransient<PackageManagement>();
-        collection.AddTransient<RemoveLocal>();
         collection.AddTransient<PackageUpdate>();
         collection.AddTransient<PackageInstall>();
         collection.AddTransient<ShellySearch>();

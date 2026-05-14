@@ -21,8 +21,7 @@ public sealed class PackageManagement(
     IConfigService configService,
     IGenericQuestionService genericQuestionService,
     IIconResolverService iconResolverService,
-    IDirtyService dirtyService,
-    RemoveLocal removeLocal
+    IDirtyService dirtyService
 ) : IShellyWindow, IReloadable
 {
     private DirtySubscription? _sub;
@@ -189,11 +188,18 @@ public sealed class PackageManagement(
 
     private async Task OpenRemoveLocal()
     {
-        using var removeLocalBox = (Box)removeLocal.CreateWindow();
+        using var removeLocal = new RemoveLocal(
+            privilegedOperationService,
+            lockoutService,
+            configService,
+            genericQuestionService,
+            dirtyService
+        );
+        using var removeLocalWindow = (Box)removeLocal.CreateWindow();
         var width = (int)Math.Max(_box.GetWidth() * 0.5, 700);
-        var height =  (int)Math.Min(_box.GetHeight() * 0.5, 400);
-        removeLocalBox.SetSizeRequest(width, height);
-        var eventArgs = new GenericDialogEventArgs(removeLocalBox);
+        var height = (int)Math.Min(_box.GetHeight() * 0.5, 400);
+        removeLocalWindow.SetSizeRequest(width, height);
+        var eventArgs = new GenericDialogEventArgs(removeLocalWindow);
         genericQuestionService.RaiseDialog(eventArgs);
         await eventArgs.ResponseTask;
     }
@@ -822,6 +828,5 @@ public sealed class PackageManagement(
         _checkBinding.Clear();
         _groups.Clear();
         _installedPackageNames.Clear();
-        removeLocal.Dispose();
     }
 }
