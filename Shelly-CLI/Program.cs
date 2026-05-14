@@ -167,8 +167,8 @@ public class Program
 
             config.AddCommand<RemoveLocalCommand>("remove-local")
                 .WithDescription("Remove a locally installed package file")
-                .WithExample("remove-local", LocalManager.InstallDir + "vlc")
-                .WithExample("remove-local", LocalManager.InstallDir + "vlc", "--no-confirm");
+                .WithExample("remove-local", Path.Combine(LocalManager.InstallDir, "vlc"))
+                .WithExample("remove-local", Path.Combine(LocalManager.InstallDir, "vlc"), "--no-confirm");
 
             config.AddCommand<UpdateCommand>("update")
                 .WithDescription("Update one or more packages")
