@@ -29,7 +29,7 @@ optdepends=(
     'archlinux-appstream-data: package icons and metadata'
     'fish: Fish shell completions'
 )
-makedepends=('dotnet-sdk-10.0' 'git' 'clang')
+makedepends=('dotnet-sdk-10.0' 'git' 'clang' 'gettext')
 
 source=("${pkgname}::git+https://github.com/Seafoam-Labs/Shelly-ALPM.git")
 
@@ -50,7 +50,7 @@ build() {
   dotnet publish Shelly.Keys/Shelly.Keys.csproj -c Release -r linux-x64 -o out-keys --nologo -p:InstructionSet=${INSTRUCTIONS:=x86-64}
 
   # Compile translations
-  msgfmt Shelly.Gtk/po/de.po -o shelly-ui-de.mo
+  #example: msgfmt Shelly.Gtk/po/de.po -o shelly-ui-de.mo
 }
 
 package() {

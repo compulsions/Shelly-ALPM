@@ -15,19 +15,32 @@ internal static partial class Translations
 
     internal static void Init()
     {
-        var localeDir = Path.Combine(AppContext.BaseDirectory, "locale");
-        if (!Directory.Exists(localeDir))
-        {
-            localeDir = "/usr/share/locale";
-        }
-        
+        const string localeDir = "/usr/share/locale";
         bindtextdomain(Domain, localeDir);
         bind_textdomain_codeset(Domain, "UTF-8");
     }
 
-    internal static string T(string msgid) =>
-        GLib.Functions.Dgettext(Domain, msgid);
+    internal static string T(string msgid)
+    {
+        try
+        {
+            return GLib.Functions.Dgettext(Domain, msgid);
+        }
+        catch (DllNotFoundException)
+        {
+            return msgid;
+        }
+    }
 
-    internal static string T(string msgid, params object[] args) =>
-        string.Format(GLib.Functions.Dgettext(Domain, msgid), args);
+    internal static string T(string msgid, params object[] args)
+    {
+        try
+        {
+            return string.Format(GLib.Functions.Dgettext(Domain, msgid), args);
+        }
+        catch (DllNotFoundException)
+        {
+            return string.Format(msgid, args);
+        }
+    }
 }
