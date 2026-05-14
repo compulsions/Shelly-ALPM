@@ -3,7 +3,7 @@ using PackageManager.Wire;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace Shelly_CLI.Commands.Standard;
+namespace Shelly_CLI.Commands.AppImage;
 
 public class AppImageGetUpdates : AsyncCommand<AppImageDefaultSettings>
 {
