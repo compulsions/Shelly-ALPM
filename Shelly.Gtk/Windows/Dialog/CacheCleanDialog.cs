@@ -5,7 +5,7 @@ namespace Shelly.Gtk.Windows.Dialog;
 public static class CacheCleanDialog
 {
     private static readonly string[] PackageSuffixes =
-        [".pkg.tar.zst", ".pkg.tar.gz", ".pkg.tar.bz2", ".pkg.tar"];
+        [".pkg.tar.zst", ".pkg.tar.xz", ".pkg.tar.gz", ".pkg.tar.bz2", ".pkg.tar"];
 
     public static Box BuildContent(
         string cacheDir,
@@ -26,7 +26,9 @@ public static class CacheCleanDialog
         var entries = ScanCache(cacheDir);
         var totalCacheSize = entries.Sum(e => e.FileSize);
 
-        var infoLabel = Label.New($"Cache directory: {cacheDir}\nTotal cached files: {entries.Count} ({FormatSize(totalCacheSize)})");
+        var infoLabel =
+            Label.New(
+                $"Cache directory: {cacheDir}\nTotal cached files: {entries.Count} ({FormatSize(totalCacheSize)})");
         infoLabel.Xalign = 0;
         infoLabel.Wrap = true;
         container.Append(infoLabel);
@@ -66,12 +68,14 @@ public static class CacheCleanDialog
 
         keepSpin.OnValueChanged += (_, _) =>
         {
-            RefreshCandidates(entries, (int)keepSpin.Value, uninstalledCheck.Active, candidateListBox, summaryLabel);
+            RefreshCandidates(entries, (int)keepSpin.Value, uninstalledCheck.Active, candidateListBox,
+                summaryLabel);
         };
 
         uninstalledCheck.OnToggled += (_, _) =>
         {
-            RefreshCandidates(entries, (int)keepSpin.Value, uninstalledCheck.Active, candidateListBox, summaryLabel);
+            RefreshCandidates(entries, (int)keepSpin.Value, uninstalledCheck.Active, candidateListBox,
+                summaryLabel);
         };
 
         var buttonBox = Box.New(Orientation.Horizontal, 10);
