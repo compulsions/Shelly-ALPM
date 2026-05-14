@@ -6,9 +6,9 @@ using Spectre.Console.Cli;
 
 namespace Shelly_CLI.Commands.Standard;
 
-public class ListAvailableCommand : Command<ListSettings>
+public class ListAvailableCommand : Command<AlpmListSettings>
 {
-    public override int Execute(CommandContext context, ListSettings settings)
+    public override int Execute(CommandContext context, AlpmListSettings settings)
     {
         if (Program.IsUiMode)
         {
@@ -111,7 +111,7 @@ public class ListAvailableCommand : Command<ListSettings>
         }
     }
 
-    private static int HandleUiModeListAvailable(ListSettings settings)
+    private static int HandleUiModeListAvailable(AlpmListSettings settings)
     {
         try
         {

@@ -1,6 +1,5 @@
 using PackageManager.AppImage;
 using PackageManager.Wire;
-using Shelly_CLI.Commands.Standard;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
