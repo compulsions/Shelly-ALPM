@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using MemoryPack;
 
 namespace Shelly.Gtk.Helpers;
@@ -9,31 +10,30 @@ namespace Shelly.Gtk.Helpers;
 public static class MemPackFrame
 {
     public const string Prefix = "[MEMPACK]";
+    public const string Suffix = "[/MEMPACK]";
 
     public static bool TryDecode<T>(string output, out T? value)
     {
         value = default;
         if (string.IsNullOrWhiteSpace(output)) return false;
-
-        foreach (var raw in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        var pref = output.IndexOf(Prefix, StringComparison.Ordinal);
+        if(pref < 0) return false;
+        var suff = output.IndexOf(Suffix,pref+Prefix.Length, StringComparison.Ordinal);
+        if(suff < 0) return false;
+        var payload = output.AsSpan(pref+Prefix.Length, suff-(pref+Prefix.Length));
+        try
         {
-            var line = StripBom(raw.Trim());
-            if (!line.StartsWith(Prefix, StringComparison.Ordinal)) continue;
-
-            var payload = line.Substring(Prefix.Length);
-            try
-            {
-                var bytes = Convert.FromBase64String(payload);
-                value = MemoryPackSerializer.Deserialize<T>(bytes);
-                return value is not null;
-            }
-            catch
-            {
-                return false;
-            }
+            
+            var bytes = Convert.FromBase64String(payload.ToString());
+            Console.Error.WriteLine($"[MemPackFrame] first16={Convert.ToHexString(bytes.AsSpan(0, Math.Min(16, bytes.Length)))}");
+            value = MemoryPackSerializer.Deserialize<T>(bytes);
+            return value is not null;
         }
-
-        return false;
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[MemPackFrame] decode failed: {ex.Message} (len={payload.Length}, mod4={payload.Length % 4})");
+            return false;
+        }
     }
 
     private static string StripBom(string s) =>

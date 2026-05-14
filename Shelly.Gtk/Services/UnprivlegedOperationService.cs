@@ -415,7 +415,7 @@ public class UnprivilegedOperationService(
         {
             if (e.Data != null)
             {
-                outputBuilder.AppendLine(e.Data);
+                outputBuilder.Append(e.Data).Append('\n');
                 Console.WriteLine(e.Data);
             }
         };

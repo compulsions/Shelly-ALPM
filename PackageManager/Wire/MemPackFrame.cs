@@ -10,6 +10,7 @@ namespace PackageManager.Wire;
 public static class MemPackFrame
 {
     public const string Prefix = "[MEMPACK]";
+    public const string Suffix = "[/MEMPACK]";
 
     public static void WriteToStdout<T>(T value)
     {
@@ -19,6 +20,7 @@ public static class MemPackFrame
         using var writer = new StreamWriter(stdout, new UTF8Encoding(false));
         writer.Write(Prefix);
         writer.Write(encoded);
+        writer.Write(Suffix);
         writer.Write('\n');
         writer.Flush();
     }
