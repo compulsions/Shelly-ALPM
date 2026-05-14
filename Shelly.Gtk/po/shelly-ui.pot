@@ -671,3 +671,138 @@ msgstr ""
 
 msgid "Upgrade All"
 msgstr ""
+
+msgid "Search..."
+msgstr ""
+
+msgid "Sync metadata for all AppImages. Useful if AppImage self updated."
+msgstr ""
+
+msgid "Sync All"
+msgstr ""
+
+msgid "Upgrade all AppImages to their latest versions"
+msgstr ""
+
+msgid "Upgrade All"
+msgstr ""
+
+msgid "Install a new AppImage from a file"
+msgstr ""
+
+msgid "Install AppImage"
+msgstr ""
+
+msgid "App Name"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Description goes here..."
+msgstr ""
+
+msgid "Size on Disk"
+msgstr ""
+
+msgid "Update Strategy"
+msgstr ""
+
+msgid "Update URL / Repository Info"
+msgstr ""
+
+msgid "e.g. repo or https://..."
+msgstr ""
+
+msgid "Installation Path"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Sync"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "StaticUrl"
+msgstr ""
+
+msgid "GitHub"
+msgstr ""
+
+msgid "GitLab"
+msgstr ""
+
+msgid "Codeberg"
+msgstr ""
+
+msgid "Forgejo"
+msgstr ""
+
+msgid "Select AppImage to Install"
+msgstr ""
+
+msgid "AppImage Files"
+msgstr ""
+
+msgid "Installing AppImage..."
+msgstr ""
+
+msgid "No AppImages need to be upgraded"
+msgstr ""
+
+msgid "Running updates..."
+msgstr ""
+
+msgid "Updating AppImages..."
+msgstr ""
+
+msgid "All AppImages updated successfully!"
+msgstr ""
+
+msgid "Version {0}"
+msgstr ""
+
+msgid "Syncing all AppImages ..."
+msgstr ""
+
+msgid "Synced"
+msgstr ""
+
+msgid "Syncing {0}..."
+msgstr ""
+
+msgid "Synced {0}"
+msgstr ""
+
+msgid "Failed to sync: {0}"
+msgstr ""
+
+msgid "Removing {0}..."
+msgstr ""
+
+msgid "{0} removed successfully!"
+msgstr ""
+
+msgid "Failed to remove {0}: {1}"
+msgstr ""
+
+msgid "{0} installed successfully!"
+msgstr ""
+
+msgid "Failed to install {0}: {1}"
+msgstr ""
+
+msgid "Failed to update AppImages: {0}"
+msgstr ""
+
+msgid "Configuration saved for {0}"
+msgstr ""
+
+msgid "Failed to save configuration: {0}"
+msgstr ""
