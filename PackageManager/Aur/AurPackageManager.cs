@@ -853,21 +853,52 @@ public sealed class AurPackageManager(string? configPath = null)
             {
                 foreach (var name in aurFallbacks)
                 {
+                    // AUR opt-deps frequently refer to *provides* names (e.g.
+                    // 'mcpelauncher-msa-ui-qt' is provided by 'mcpelauncher-msa-ui-qt-git').
+                    // Resolve the name to one or more real AUR package names before clone.
+                    var providers = await _aurSearchManager.FindProvidersAsync(name);
+
+                    string? chosen;
+                    if (providers.Count == 0)
+                    {
+                        ErrorEvent?.Invoke(this, new AlpmErrorEventArgs(
+                            $"Optional dependency '{name}' not found in sync DBs or AUR (no provider)."));
+                        continue;
+                    }
+                    if (providers.Count == 1)
+                    {
+                        chosen = providers[0];
+                    }
+                    else
+                    {
+                        var qArgs = new AlpmQuestionEventArgs(
+                            AlpmQuestionType.SelectProvider,
+                            $"Multiple AUR providers for '{name}'",
+                            providers,
+                            name);
+                        _alpm.RaiseQuestion(qArgs);
+                        qArgs.WaitForResponse();
+                        var idx = qArgs.Response;
+                        chosen = idx >= 0 && idx < providers.Count ? providers[idx] : providers[0];
+                    }
+
                     BuildOutput?.Invoke(this, new BuildOutputEventArgs
                     {
                         PackageName = parentPkg,
-                        Line = $"[Shelly] Attempting AUR install for optional dependency: {name}",
+                        Line = string.Equals(chosen, name, StringComparison.Ordinal)
+                            ? $"[Shelly] Attempting AUR install for optional dependency: {chosen}"
+                            : $"[Shelly] Resolved AUR optdep '{name}' → '{chosen}'; attempting install",
                         IsError = false
                     });
                     try
                     {
-                        await InstallPackages(new List<string> { name });
-                        MarkAsDepend(new[] { name });
+                        await InstallPackages(new List<string> { chosen });
+                        MarkAsDepend(new[] { chosen });
                     }
                     catch (Exception ex)
                     {
                         ErrorEvent?.Invoke(this, new AlpmErrorEventArgs(
-                            $"Optional dependency '{name}' not found in sync DBs or AUR: {ex.Message}"));
+                            $"Optional dependency '{name}' (provider '{chosen}') failed to install: {ex.Message}"));
                     }
                 }
             }
