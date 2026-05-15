@@ -499,147 +499,157 @@ msgid "Permission Changes"
 msgstr "Mudanças de Permissão"
 
 msgid "Updating Flatpak packages..."
-msgstr ""
+msgstr "Atualizando Pacotes Flatpak..."
 
 msgid "Failed to update packages: {0}"
-msgstr ""
+msgstr "Falha ao atualizar pacotes: {0}"
 
 msgid "Updated all Flatpak(s)"
-msgstr ""
+msgstr "Todos os Flatpaks Atualizados"
 
 msgid "<span size='large'>System packages are up to date</span>"
-msgstr ""
+msgstr "<span size='large'>Pacotes do sistema estão na versão mais recente</span>"
 
 msgid "Current"
-msgstr ""
+msgstr "Atual"
 
 msgid "New"
-msgstr ""
+msgstr "Novo"
 
 msgid "Download"
 msgstr ""
 
 msgid "Size Diff"
-msgstr ""
+msgstr "Diferença de Tamanho"
 
 msgid "Repository"
-msgstr ""
+msgstr "Repositório"
 
 msgid "Size"
-msgstr ""
+msgstr "Tamanho"
 
 msgid "Partial Update Warning"
-msgstr ""
+msgstr "Aviso de Atualização Parcial"
 
 msgid ""
 "It is not advised you do partial system updates. Are you sure you want to "
 "continue?"
 msgstr ""
+"Atualizar o sistema parcialmente é contraindicado. Você tem certeza que você "
+"quer continuar?"
 
 msgid ""
 "It is unadvised to not update all packages at once. Are you sure you want to "
 "continue?"
 msgstr ""
+"É recomendado atualizar todos os pacotes de uma vez. Você tem certeza que quer continuar?"
 
 msgid "Updating..."
-msgstr ""
+msgstr "Atualizando..."
 
 msgid "Reboot Required"
-msgstr ""
+msgstr "Reinicialização Necessária"
 
 msgid ""
 "A full system reboot is required for updates to take effect.\n"
 "\n"
 "Would you like to reboot now?"
 msgstr ""
+"É necessário reiniciar o sistema para que as atualizações sejam aplicadas.\n"
+"\n"
+"Você deseja reiniciar agora?"
 
 msgid "Service Restart Failures"
-msgstr ""
+msgstr "Falhas ao Reiniciar Serviços"
 
 msgid ""
 "The following services failed to restart automatically:\n"
 "{0}"
 msgstr ""
+"Os seguintes serviços falharam na reinicialização automática:\n"
+"{0}"
 
 msgid "--- Packages to Upgrade ---"
-msgstr ""
+msgstr "--- Pacotes para Atualizar ---"
 
 msgid "Export Shelly install log"
-msgstr ""
+msgstr "Exportar log de instalação do Shelly"
 
 msgid "Exported Shelly install log"
-msgstr ""
+msgstr "Log de instalação do Shelly exportado com sucesso"
 
 msgid "Failed to export Shelly install log"
-msgstr ""
+msgstr "Falha na exportação de log de instalação do Shelly"
 
 msgid "Install Local Package"
-msgstr ""
+msgstr "Instalação de Pacote Local"
 
 msgid "Local package files (\"*.gz\", \"*.zst\")"
-msgstr ""
+msgstr "Arquivos de pacote locais (\"*.gz\", \"*.zst\")"
 
 msgid "Installing local package..."
-msgstr ""
+msgstr "Instalando pacote local..."
 
 msgid "Installed local package"
-msgstr ""
+msgstr "Pacote local instalado com sucesso"
 
 msgid "Package Files ({0})"
-msgstr ""
+msgstr "Arquivos de Pacote ({0})"
 
 msgid "Remove corrupted packages"
-msgstr ""
+msgstr "Remover pacotes corrompidos"
 
 msgid "Select File"
-msgstr ""
+msgstr "Selecionar Arquivo"
 
 msgid "Recommend"
-msgstr ""
+msgstr "Recomendar"
 
 msgid "AUR"
-msgstr ""
+msgstr "AUR"
 
 msgid "Flatpak"
-msgstr ""
+msgstr "Flatpak"
 
 msgid "AppImage"
-msgstr ""
+msgstr "AppImage"
 
 msgid "Shelly Search"
-msgstr ""
+msgstr "Pesquisa Shelly"
 
 msgid "Select Icon File"
-msgstr ""
+msgstr "Selecionar Arquivo de Ícone"
 
 msgid "Image Files"
-msgstr ""
+msgstr "Arquivos de Imagem"
 
 msgid "Enable AUR?"
-msgstr ""
+msgstr "Habilitar AUR"
 
 msgid ""
 "The Arch User Repository (AUR) is a community-driven repository. Packages "
 "are user-produced and may contain risks. Do you want to enable it?"
-msgstr ""
+msgstr "" 
+"O Arch User Repository (AUR) é um repositório mantido pela comunidade. Os "
+"pacotes são produzidos por usuários e podem conter riscos. Deseja ativá-lo?"
 
 msgid "Missing Flatpak"
-msgstr ""
+msgstr "Flatpaks Falando"
 
 msgid "Would you like to install this this now?"
-msgstr ""
+msgstr "Você gostaria de instalar isso agora?"
 
 msgid "Installing flatpak..."
-msgstr ""
+msgstr "Instalando Flatpak..."
 
 msgid "Reboot required to complete installation."
-msgstr ""
+msgstr "Reinicialização necessária para finalizar instalação"
 
 msgid "Synchronizing databases..."
-msgstr ""
+msgstr "Sincronizando bancos de dados"
 
 msgid "Database lock removed"
-msgstr ""
+msgstr "Trava de banco de dados removida"
 
 msgid "Shelly folder ownership restored"
 msgstr ""
