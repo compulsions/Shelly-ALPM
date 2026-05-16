@@ -1,9 +1,7 @@
 using System.Text.Json.Serialization;
-using MemoryPack;
 
 namespace Shelly.Gtk.UiModels.PackageManagerObjects;
 
-[MemoryPackable]
 public partial class FlatpakPackageDto // match the CLI: class, not record
 {
     [JsonPropertyName("id")] public string Id { get; set; } = string.Empty;

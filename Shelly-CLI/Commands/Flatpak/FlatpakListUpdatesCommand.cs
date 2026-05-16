@@ -58,7 +58,7 @@ public class FlatpakListUpdatesCommand : Command<DefaultSettings>
 
         if (settings.JsonOutput)
         {
-            MemPackFrame.WriteToStdout(packages);
+            JsonPackFrame.WriteToStdout(packages);
             return 0;
         }
 

@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using MemoryPack;
 
 namespace PackageManager.Flatpak;
 
-[MemoryPackable]
 public partial class FlatpakPackageDto
 {
     public string Id { get; set; } = string.Empty;
