@@ -11,6 +11,9 @@ using Shelly_CLI.Configuration;
 
 namespace Shelly_CLI;
 
+[JsonSourceGenerationOptions(
+    MaxDepth = 256,
+    GenerationMode = JsonSourceGenerationMode.Default)]
 [JsonSerializable(typeof(List<AlpmPackageUpdateDto>))]
 [JsonSerializable(typeof(AlpmPackageUpdateDto))]
 [JsonSerializable(typeof(List<AlpmPackageDto>))]
@@ -40,4 +43,14 @@ namespace Shelly_CLI;
 [JsonSerializable(typeof(PacfileRecord))]
 [JsonSerializable(typeof(PackageBuild))]
 [JsonSerializable(typeof(FlatpakRemoteRefInfo))]
+[JsonSerializable(typeof(List<AppstreamApp>))]
+[JsonSerializable(typeof(AppstreamApp))]
+[JsonSerializable(typeof(AppstreamIcon))]
+[JsonSerializable(typeof(List<AppstreamIcon>))]
+[JsonSerializable(typeof(AppstreamScreenshot))]
+[JsonSerializable(typeof(List<AppstreamScreenshot>))]
+[JsonSerializable(typeof(AppstreamImage))]
+[JsonSerializable(typeof(List<AppstreamImage>))]
+[JsonSerializable(typeof(AppstreamRelease))]
+[JsonSerializable(typeof(List<AppstreamRelease>))]
 internal partial class ShellyCLIJsonContext : JsonSerializerContext;

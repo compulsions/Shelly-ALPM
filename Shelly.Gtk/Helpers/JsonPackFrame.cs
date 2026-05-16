@@ -30,7 +30,11 @@ public static class JsonPackFrame
         {
             var bytes = Convert.FromBase64String(payload.ToString());
             var json = Encoding.UTF8.GetString(bytes);
-            var typeInfo = (JsonTypeInfo<T>)ShellyGtkJsonContext.Default.GetTypeInfo(typeof(T))!;
+            var info = ShellyGtkJsonContext.Default.GetTypeInfo(typeof(T))
+                ?? throw new InvalidOperationException(
+                    $"ShellyGtkJsonContext has no [JsonSerializable] entry for {typeof(T)}. " +
+                    $"Add [JsonSerializable(typeof({typeof(T).Name}))] to Shelly.Gtk/ShellyGtkJsonContext.cs.");
+            var typeInfo = (JsonTypeInfo<T>)info;
             value = JsonSerializer.Deserialize(json, typeInfo);
             return value is not null;
         }

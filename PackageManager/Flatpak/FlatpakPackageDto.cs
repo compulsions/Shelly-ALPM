@@ -24,13 +24,3 @@ public partial class FlatpakPackageDto
 
     public List<string> Permissions { get; set; } = [];
 }
-
-[JsonSourceGenerationOptions(
-    PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower,
-    NumberHandling = JsonNumberHandling.AllowReadingFromString,
-    WriteIndented = false)]
-[JsonSerializable(typeof(FlatpakPackageDto))]
-[JsonSerializable(typeof(List<FlatpakPackageDto>))]
-public partial class FlatpakDtoJsonContext : JsonSerializerContext
-{
-}
