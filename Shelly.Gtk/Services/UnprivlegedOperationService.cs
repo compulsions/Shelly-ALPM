@@ -295,6 +295,30 @@ public class UnprivilegedOperationService(
         return [];
     }
 
+    public Task<OperationResult> AddSystemdServiceTray(string serviceContent, string service)
+    {
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".config/systemd/user");
+
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, $"{service}.service"), serviceContent);
+
+        _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", $"--user daemon-reload");
+        _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", $"--user stop {service}");
+        
+        return Task.FromResult(new OperationResult());
+    }
+
+    public Task<OperationResult> RemoveSystemdServiceTray(string service)
+    {
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".config/systemd/user");
+        Directory.Delete($"{dir}/{service}.service", true);
+        return Task.FromResult(new OperationResult());
+    }
+
 
     public async Task<List<AppImageDto>> GetUpdatesAppImagesAsync()
     {
