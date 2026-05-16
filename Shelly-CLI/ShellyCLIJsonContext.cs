@@ -53,4 +53,6 @@ namespace Shelly_CLI;
 [JsonSerializable(typeof(List<AppstreamImage>))]
 [JsonSerializable(typeof(AppstreamRelease))]
 [JsonSerializable(typeof(List<AppstreamRelease>))]
+[JsonSerializable(typeof(PackageBuild))]
+[JsonSerializable(typeof(List<PackageBuild>))]
 internal partial class ShellyCLIJsonContext : JsonSerializerContext;
