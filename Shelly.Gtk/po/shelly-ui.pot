@@ -1252,3 +1252,9 @@ msgstr ""
 
 msgid "Add Tray To Auto Start"
 msgstr ""
+
+msgid "Systemd startup service added."
+msgstr ""
+
+msgid "Systemd startup service removed."
+msgstr ""

@@ -370,6 +370,8 @@ public class Settings(
             else
             {
                 unprivilegedOperationService.RemoveSystemdServiceTray("shelly-notifications");
+                genericQuestionService.RaiseToastMessage(
+                    new ToastMessageEventArgs(Translations.T("Systemd startup service removed.")));
             }
 
             updateAction(e.State);

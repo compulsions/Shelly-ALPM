@@ -7,6 +7,7 @@ using Shelly.Gtk.Services.TrayServices;
 using Shelly.Gtk.UiModels;
 using Shelly.Gtk.UiModels.AppImage;
 using Shelly.Gtk.UiModels.PackageManagerObjects;
+using Shelly.Utilities;
 
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable AccessToModifiedClosure
@@ -297,14 +298,11 @@ public class UnprivilegedOperationService(
 
     public Task<OperationResult> AddSystemdServiceTray(string serviceContent, string service)
     {
-        var dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".config/systemd/user");
-
+        var dir = XdgPaths.ConfigHome() + "/systemd/user";
         Directory.CreateDirectory(dir);
         File.WriteAllText(Path.Combine(dir, $"{service}.service"), serviceContent);
 
-        _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", $"--user daemon-reload");
+        _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", "--user daemon-reload");
         _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", $"--user stop {service}");
         
         return Task.FromResult(new OperationResult());
@@ -312,10 +310,12 @@ public class UnprivilegedOperationService(
 
     public Task<OperationResult> RemoveSystemdServiceTray(string service)
     {
-        var dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".config/systemd/user");
-        Directory.Delete($"{dir}/{service}.service", true);
+        var dir = XdgPaths.ConfigHome() + "/systemd/user";
+        File.Delete($"{dir}/{service}.service");
+        
+        _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", "--user daemon-reload");
+        _ = ExecuteUnprivilegedCommandAsync("Systemctl", "systemctl", $"--user stop {service}");
+
         return Task.FromResult(new OperationResult());
     }
 
